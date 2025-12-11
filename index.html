@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html>
-    <link rel="stylesheet" href="/styles/style.css">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quest Board</title>
+    <script type="module" src="/main.js"></script>
     <style>
         .quest-board-header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -583,40 +583,33 @@
     // Load quests from API
     function loadQuests() {
         document.getElementById('quest-list').innerHTML = '<p style="text-align: center; color: #666;">Loading quests...</p>';
-        
-        fetch('/api/quests?count=6')
-            .then(response => response.json())
-            .then(quests => {
-                const questList = document.getElementById('quest-list');
-                questList.innerHTML = '';
-                
-                quests.forEach(quest => {
-                    const questCard = document.createElement('div');
-                    questCard.className = 'quest-card';
-                    questCard.setAttribute('data-quest-id', quest.quest_id);
-                    
-                    const isCompleted = localStorage.getItem('quest_' + quest.quest_id) === 'completed';
-                    
-                    questCard.innerHTML = `
-                        <div>
-                            <span class="quest-category category-${quest.category}">${quest.category}</span>
-                            <span class="quest-status ${isCompleted ? 'completed' : quest.status}">
-                                ${isCompleted ? 'COMPLETED' : quest.status.toUpperCase()}
-                            </span>
-                        </div>
-                        <div class="quest-title">${quest.title}</div>
-                        <div class="quest-description">${quest.description}</div>
-                        <button class="complete-btn" onclick="completeQuest(${quest.quest_id})" ${isCompleted ? 'disabled' : ''}>
-                            ${isCompleted ? '✓ Completed' : 'Mark as Complete'}
-                        </button>
-                    `;
-                    questList.appendChild(questCard);
-                });
-            })
-            .catch(error => {
-                console.error('Error loading quests:', error);
-                document.getElementById('quest-list').innerHTML = '<p style="color: #f44336;">Error loading quests. Please try again.</p>';
-            });
+
+        const quests = window.questBoardAPI.generateRandomQuests(6);
+        const questList = document.getElementById('quest-list');
+        questList.innerHTML = '';
+
+        quests.forEach(quest => {
+            const questCard = document.createElement('div');
+            questCard.className = 'quest-card';
+            questCard.setAttribute('data-quest-id', quest.quest_id);
+
+            const isCompleted = localStorage.getItem('quest_' + quest.quest_id) === 'completed';
+
+            questCard.innerHTML = `
+                <div>
+                    <span class="quest-category category-${quest.category}">${quest.category}</span>
+                    <span class="quest-status ${isCompleted ? 'completed' : quest.status}">
+                        ${isCompleted ? 'COMPLETED' : quest.status.toUpperCase()}
+                    </span>
+                </div>
+                <div class="quest-title">${quest.title}</div>
+                <div class="quest-description">${quest.description}</div>
+                <button class="complete-btn" onclick="completeQuest(${quest.quest_id})" ${isCompleted ? 'disabled' : ''}>
+                    ${isCompleted ? '✓ Completed' : 'Mark as Complete'}
+                </button>
+            `;
+            questList.appendChild(questCard);
+        });
     }
 
     // Complete a quest
@@ -649,16 +642,10 @@
 
     // Load shop items
     function loadShop() {
-        fetch('/api/shop')
-            .then(response => response.json())
-            .then(shopData => {
-                renderShopItems(shopData.avatars, 'avatars-grid', 'avatar');
-                renderShopItems(shopData.cosmetics, 'cosmetics-grid', 'cosmetic');
-                renderCrateItems(shopData.vip_crates, 'crates-grid');
-            })
-            .catch(error => {
-                console.error('Error loading shop:', error);
-            });
+        const shopData = window.questBoardAPI.getShopItems();
+        renderShopItems(shopData.avatars, 'avatars-grid', 'avatar');
+        renderShopItems(shopData.cosmetics, 'cosmetics-grid', 'cosmetic');
+        renderCrateItems(shopData.vip_crates, 'crates-grid');
     }
 
     // Render VIP crate items
@@ -698,96 +685,80 @@
         coins -= price;
         updateCoins();
         localStorage.setItem('coins', coins);
-        
+
         // Call API to open crate
-        fetch(`/api/vip/crates/${crateId}/open`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ vip_level: userVipLevel })
-        })
-        .then(response => response.json())
-        .then(result => {
-            if (result.error) {
-                alert('Error: ' + result.error);
-                // Refund coins if there was an error
-                coins += price;
-                updateCoins();
-                localStorage.setItem('coins', coins);
-                return;
-            }
-            
-            // Show reward animation
-            const reward = result.reward;
-            const rewardDiv = document.createElement('div');
-            rewardDiv.style.cssText = `
-                position: fixed;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                color: white;
-                padding: 40px 60px;
-                border-radius: 15px;
-                font-size: 24px;
-                font-weight: bold;
-                z-index: 2000;
-                text-align: center;
-                box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-                animation: bounce 0.5s ease;
-            `;
-            
-            const rarityColors = {
-                'common': '#9e9e9e',
-                'uncommon': '#4caf50',
-                'rare': '#2196f3',
-                'epic': '#9c27b0',
-                'legendary': '#ff9800',
-                'mythic': '#f44336'
-            };
-            
-            rewardDiv.innerHTML = `
-                <div style="font-size: 64px; margin-bottom: 20px;">${reward.emoji}</div>
-                <div style="font-size: 28px; margin-bottom: 10px;">${reward.item}</div>
-                <div style="font-size: 16px; color: ${rarityColors[reward.rarity]}; text-transform: uppercase; letter-spacing: 2px;">
-                    ${reward.rarity}
-                </div>
-                ${reward.type === 'points' ? `<div style="font-size: 20px; margin-top: 15px;">+${reward.value} coins 💰</div>` : ''}
-            `;
-            
-            document.body.appendChild(rewardDiv);
-            
-            // Add bounce animation
-            const style = document.createElement('style');
-            style.textContent = `
-                @keyframes bounce {
-                    0%, 100% { transform: translate(-50%, -50%) scale(1); }
-                    50% { transform: translate(-50%, -50%) scale(1.1); }
-                }
-            `;
-            document.head.appendChild(style);
-            
-            // If reward is points, add them to coins
-            if (reward.type === 'points' && reward.value) {
-                coins += reward.value;
-                updateCoins();
-                localStorage.setItem('coins', coins);
-            }
-            
-            setTimeout(() => {
-                rewardDiv.remove();
-                style.remove();
-            }, 3500);
-        })
-        .catch(error => {
-            console.error('Error opening crate:', error);
-            alert('Error opening crate. Please try again.');
-            // Refund coins
+        const result = window.questBoardAPI.openCrate(crateId, userVipLevel);
+
+        if (result.error) {
+            alert('Error: ' + result.error);
+            // Refund coins if there was an error
             coins += price;
             updateCoins();
             localStorage.setItem('coins', coins);
-        });
+            return;
+        }
+
+        // Show reward animation
+        const reward = result.reward;
+        const rewardDiv = document.createElement('div');
+        rewardDiv.style.cssText = `
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 60px;
+            border-radius: 15px;
+            font-size: 24px;
+            font-weight: bold;
+            z-index: 2000;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            animation: bounce 0.5s ease;
+        `;
+
+        const rarityColors = {
+            'common': '#9e9e9e',
+            'uncommon': '#4caf50',
+            'rare': '#2196f3',
+            'epic': '#9c27b0',
+            'legendary': '#ff9800',
+            'mythic': '#f44336'
+        };
+
+        rewardDiv.innerHTML = `
+            <div style="font-size: 64px; margin-bottom: 20px;">${reward.emoji}</div>
+            <div style="font-size: 28px; margin-bottom: 10px;">${reward.item}</div>
+            <div style="font-size: 16px; color: ${rarityColors[reward.rarity]}; text-transform: uppercase; letter-spacing: 2px;">
+                ${reward.rarity}
+            </div>
+            ${reward.type === 'points' ? `<div style="font-size: 20px; margin-top: 15px;">+${reward.value} coins 💰</div>` : ''}
+        `;
+
+        document.body.appendChild(rewardDiv);
+
+        // Add bounce animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes bounce {
+                0%, 100% { transform: translate(-50%, -50%) scale(1); }
+                50% { transform: translate(-50%, -50%) scale(1.1); }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // If reward is points, add them to coins
+        if (reward.type === 'points' && reward.value) {
+            coins += reward.value;
+            updateCoins();
+            localStorage.setItem('coins', coins);
+        }
+
+        setTimeout(() => {
+            rewardDiv.remove();
+            style.remove();
+        }, 3500);
     }
 
     // Render shop items
