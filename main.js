@@ -29,7 +29,7 @@ const QUEST_TEMPLATES = {
         { activity: "Meditate", units: "minutes", range: [5, 20] },
         { activity: "Sleep", units: "hours", range: [7, 9] },
         { activity: "Take deep breaths", units: "cycles", range: [5, 15] },
-        { activity: "Go outside for fresh air", units: "minutes", range: [10, 30] }
+        { activity: "Go Outside and Touch Grass", units: "minutes", range: [10, 30] }
     ]
 };
 
