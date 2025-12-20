@@ -397,6 +397,26 @@
         #main-content {
             display: none;
         }
+
+        /* New styles for quest filter dropdown */
+        .quest-controls {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .quest-filter {
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+            font-size: 14px;
+            background: white;
+        }
+
+        .quest-filter:focus {
+            outline: none;
+            border-color: #667eea;
+        }
     </style>
 </head>
 <body>
@@ -457,7 +477,16 @@
     <div class="quest-board-container">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
             <h2 style="color: #333; margin: 0;">Your Daily Health Quests</h2>
-            <button id="refresh-quests" class="refresh-btn">🔄 Get New Quests</button>
+            <div class="quest-controls">
+                <select id="quest-filter" class="quest-filter" title="Filter quests by category">
+                    <option value="all">All Quests</option>
+                    <option value="cardio">Cardio</option>
+                    <option value="strength">Strength</option>
+                    <option value="flexibility">Flexibility</option>
+                    <option value="wellness">Wellness</option>
+                </select>
+                <button id="refresh-quests" class="refresh-btn">🔄 Get New Quests</button>
+            </div>
         </div>
         <div id="quest-list">
             <!-- Quests will be loaded here dynamically -->
@@ -515,7 +544,8 @@
     // Update coin display
     function updateCoins() {
         document.getElementById('coin-count').textContent = coins;
-        document.getElementById('shop-coin-count').textContent = coins;
+        const shopCoin = document.getElementById('shop-coin-count');
+        if (shopCoin) shopCoin.textContent = coins;
         localStorage.setItem('coins', coins);
     }
 
@@ -580,11 +610,12 @@
         }
     });
 
-    // Load quests from API
+    // Load quests from API, optionally filtered by category
     function loadQuests() {
         document.getElementById('quest-list').innerHTML = '<p style="text-align: center; color: #666;">Loading quests...</p>';
 
-        const quests = window.questBoardAPI.generateRandomQuests(6);
+        const filter = document.getElementById('quest-filter') ? document.getElementById('quest-filter').value : 'all';
+        const quests = window.questBoardAPI.generateRandomQuests(6, filter);
         const questList = document.getElementById('quest-list');
         questList.innerHTML = '';
 
@@ -616,6 +647,7 @@
     function completeQuest(questId) {
         localStorage.setItem('quest_' + questId, 'completed');
         const questCard = document.querySelector(`[data-quest-id="${questId}"]`);
+        if (!questCard) return;
         const statusSpan = questCard.querySelector('.quest-status');
         const completeBtn = questCard.querySelector('.complete-btn');
         
@@ -631,7 +663,7 @@
         
         // Show celebration message
         const celebration = document.createElement('div');
-        celebration.style.cssText = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #4caf50; color: white; padding: 20px 40px; border-radius: 10px; font-size: 24px; font-weight: bold; z-index: 1000;';
+        celebration.style.cssText = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #4caf50; color: white; padding: 20px 40px; border-radius: 10px; font-size: 24px; z-index: 2000; text-align: center;';
         celebration.innerHTML = `🎉 Quest Completed! 🎉<br><span style="font-size: 18px;">+${coinsEarned} coins 💰</span>`;
         document.body.appendChild(celebration);
         
@@ -730,8 +762,8 @@
         rewardDiv.innerHTML = `
             <div style="font-size: 64px; margin-bottom: 20px;">${reward.emoji}</div>
             <div style="font-size: 28px; margin-bottom: 10px;">${reward.item}</div>
-            <div style="font-size: 16px; color: ${rarityColors[reward.rarity]}; text-transform: uppercase; letter-spacing: 2px;">
-                ${reward.rarity}
+            <div style="font-size: 16px; color: ${rarityColors[reward.rarity] || '#fff'}; text-transform: uppercase; letter-spacing: 2px;">
+                ${reward.rarity || ''}
             </div>
             ${reward.type === 'points' ? `<div style="font-size: 20px; margin-top: 15px;">+${reward.value} coins 💰</div>` : ''}
         `;
@@ -808,7 +840,7 @@
             
             // Show purchase success
             const message = document.createElement('div');
-            message.style.cssText = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #4caf50; color: white; padding: 20px 40px; border-radius: 10px; font-size: 20px; font-weight: bold; z-index: 2000;';
+            message.style.cssText = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #4caf50; color: white; padding: 20px 40px; border-radius: 10px; font-size: 20px; z-index: 2000; text-align: center;';
             message.textContent = '✓ Purchase Successful!';
             document.body.appendChild(message);
             
@@ -937,18 +969,25 @@ const VIP_CRATES = {
     }
 };
 
-function generateRandomQuests(count = 6) {
+function generateRandomQuests(count = 6, categoryFilter = 'all') {
     const quests = [];
     const categories = Object.keys(QUEST_TEMPLATES);
 
+    // Normalize filter
+    const filter = (categoryFilter || 'all').toLowerCase();
+
     for (let i = 0; i < count; i++) {
-        const category = categories[i % categories.length];
+        // Determine category: if filter is 'all' pick random, otherwise use filter
+        const category = (filter === 'all' || !QUEST_TEMPLATES[filter]) ? categories[Math.floor(Math.random() * categories.length)] : filter;
         const templates = QUEST_TEMPLATES[category];
         const template = templates[Math.floor(Math.random() * templates.length)];
         const amount = Math.floor(Math.random() * (template.range[1] - template.range[0] + 1)) + template.range[0];
 
+        // Use a more unique quest_id so that multiple refreshes don't collide with stored quest_ keys
+        const questId = Date.now() + i + Math.floor(Math.random() * 1000);
+
         quests.push({
-            quest_id: i + 1,
+            quest_id: questId,
             title: `${template.activity} Challenge`,
             description: `Complete ${amount} ${template.units} of ${template.activity.toLowerCase()}`,
             category: category,
@@ -993,9 +1032,9 @@ window.questBoardAPI = {
     openCrate
 };
     
-    // Refresh quests button
+    // Refresh quests button: clear local quest completion markers and load new quests using selected filter
     document.getElementById('refresh-quests').addEventListener('click', function() {
-        // Clear completed quests from localStorage
+        // Clear completed quests from localStorage (quest_ keys)
         Object.keys(localStorage).forEach(key => {
             if (key.startsWith('quest_')) {
                 localStorage.removeItem(key);
@@ -1003,6 +1042,18 @@ window.questBoardAPI = {
         });
         loadQuests();
     });
+
+    // When filter changes, reload quests
+    const filterSelect = document.getElementById('quest-filter');
+    if (filterSelect) {
+        filterSelect.addEventListener('change', function() {
+            loadQuests();
+        });
+    }
+
+    // Ensure UI shows stored coins and profile on load (if user already logged in in this session)
+    updateCoins();
+    updateProfile();
 </script>
 
 </body>
