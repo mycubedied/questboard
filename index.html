@@ -99,6 +99,11 @@
             color: #388e3c;
         }
 
+        .category-custom {
+            background: #eceff1;
+            color: #37474f;
+        }
+
         .complete-btn {
             background: #4caf50;
             color: white;
@@ -435,6 +440,51 @@
             border-color: #667eea;
         }
 
+        /* Small form for adding custom quests */
+        .custom-quest-form {
+            margin: 18px 0;
+            padding: 12px;
+            background: #fafafa;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .custom-quest-form input[type="text"] {
+            flex: 1 1 240px;
+            padding: 8px 10px;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+            font-size: 14px;
+        }
+
+        .custom-quest-form textarea {
+            flex: 2 1 360px;
+            padding: 8px 10px;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+            font-size: 14px;
+            resize: vertical;
+            min-height: 48px;
+        }
+
+        .add-custom-btn {
+            background: #00bfa5;
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .add-custom-btn:hover {
+            background: #009e90;
+        }
+
         /* Active quest full-screen view */
         #active-quest-screen {
             display: none;
@@ -503,6 +553,7 @@
             #active-quest-screen .active-quest-title { font-size: 22px; }
             #active-quest-screen .mark-complete-btn { width: 100%; display: block; margin-bottom: 8px; }
             #active-quest-screen .cancel-quest-btn { width: 100%; display: block; margin-top: 8px; }
+            .custom-quest-form { flex-direction: column; align-items: stretch; }
         }
     </style>
 </head>
@@ -562,7 +613,7 @@
     </div>
 
     <div class="quest-board-container">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
             <h2 style="color: #333; margin: 0;">Your Daily Health Quests</h2>
             <div class="quest-controls">
                 <select id="quest-filter" class="quest-filter" title="Filter quests by category">
@@ -571,10 +622,19 @@
                     <option value="strength">Strength</option>
                     <option value="flexibility">Flexibility</option>
                     <option value="wellness">Wellness</option>
+                    <option value="custom">Custom</option>
                 </select>
                 <button id="refresh-quests" class="refresh-btn">🔄 Get New Quests</button>
             </div>
         </div>
+
+        <!-- Custom Quest Form -->
+        <div class="custom-quest-form" id="custom-quest-form">
+            <input id="custom-title" type="text" placeholder="Custom quest title (e.g. Evening Walk)" />
+            <textarea id="custom-description" placeholder="Custom quest description (what to do)"></textarea>
+            <button id="add-custom-quest" class="add-custom-btn">Add Custom Quest</button>
+        </div>
+
         <div id="quest-list">
             <!-- Quests will be loaded here dynamically -->
         </div>
@@ -653,7 +713,25 @@
     let ownedItems = JSON.parse(localStorage.getItem('ownedItems')) || [];
     let equippedAvatar = localStorage.getItem('equippedAvatar') || '👤';
     let equippedTitle = localStorage.getItem('equippedTitle') || '';
-    let currentQuests = []; // store currently generated quests so startQuest can find them
+    let currentQuests = []; // store currently generated + custom quests so startQuest can find them
+
+    // Custom quests persistence key
+    const CUSTOM_QUESTS_KEY = 'customQuests_v1';
+
+    function loadCustomQuestsFromStorage() {
+        try {
+            const raw = localStorage.getItem(CUSTOM_QUESTS_KEY);
+            if (!raw) return [];
+            return JSON.parse(raw);
+        } catch (e) {
+            console.error('Error parsing custom quests from localStorage', e);
+            return [];
+        }
+    }
+
+    function saveCustomQuestsToStorage(arr) {
+        localStorage.setItem(CUSTOM_QUESTS_KEY, JSON.stringify(arr));
+    }
 
     // Update coin display
     function updateCoins() {
@@ -727,20 +805,88 @@
         }
     });
 
-    // Load quests from API, optionally filtered by category
+    // Add custom quest button handler
+    document.getElementById('add-custom-quest').addEventListener('click', function() {
+        const titleInput = document.getElementById('custom-title');
+        const descInput = document.getElementById('custom-description');
+
+        const title = (titleInput.value || '').trim();
+        const description = (descInput.value || '').trim();
+
+        if (!title) {
+            alert('Please enter a title for the custom quest.');
+            return;
+        }
+        if (!description) {
+            alert('Please enter a description for the custom quest.');
+            return;
+        }
+
+        const customQuests = loadCustomQuestsFromStorage();
+
+        const questId = Date.now() + Math.floor(Math.random() * 1000);
+        const newQuest = {
+            quest_id: questId,
+            title: title,
+            description: description,
+            category: 'custom',
+            status: 'active',
+            custom: true // marker
+        };
+
+        customQuests.push(newQuest);
+        saveCustomQuestsToStorage(customQuests);
+
+        // clear fields
+        titleInput.value = '';
+        descInput.value = '';
+
+        // reload quests
+        loadQuests();
+    });
+
+    // Load quests from API, optionally filtered by category, and include custom quests when appropriate
     function loadQuests() {
-        document.getElementById('quest-list').innerHTML = '<p style="text-align: center; color: #666;">Loading quests...</p>';
+        const questList = document.getElementById('quest-list');
+        questList.innerHTML = '<p style="text-align: center; color: #666;">Loading quests...</p>';
 
         const filter = document.getElementById('quest-filter') ? document.getElementById('quest-filter').value : 'all';
-        const quests = window.questBoardAPI.generateRandomQuests(6, filter);
-        currentQuests = quests; // store the current set so startQuest can look them up
-        const questList = document.getElementById('quest-list');
+
+        // Generated quests (not custom)
+        const generatedQuests = window.questBoardAPI.generateRandomQuests(6, filter === 'all' ? 'all' : filter);
+        // load custom quests
+        const customQuests = loadCustomQuestsFromStorage();
+
+        let questsToShow = [];
+
+        if (filter === 'custom') {
+            // Only custom quests
+            questsToShow = customQuests.slice(); // copy
+        } else if (filter === 'all') {
+            // show generated + custom (custom at end)
+            questsToShow = generatedQuests.concat(customQuests);
+        } else {
+            // filter is a specific non-custom category; show only generated from that category
+            // (generateRandomQuests above already respects the filter argument, but to be safe ensure categories match)
+            questsToShow = generatedQuests.filter(q => q.category === filter).concat(customQuests.filter(q => false)); // no custom in specific filters
+        }
+
+        // Make sure IDs are unique — generatedQuests already use timestamp-based ids
+        currentQuests = questsToShow;
         questList.innerHTML = '';
 
-        quests.forEach(quest => {
+        if (questsToShow.length === 0) {
+            questList.innerHTML = '<p style="text-align:center;color:#666">No quests available for the selected category.</p>';
+            return;
+        }
+
+        questsToShow.forEach(quest => {
             const questCard = document.createElement('div');
             questCard.className = 'quest-card';
             questCard.setAttribute('data-quest-id', quest.quest_id);
+            if (quest.category === 'custom') {
+                questCard.setAttribute('data-custom', 'true');
+            }
 
             const isCompleted = localStorage.getItem('quest_' + quest.quest_id) === 'completed';
 
@@ -751,8 +897,8 @@
                         ${isCompleted ? 'COMPLETED' : quest.status.toUpperCase()}
                     </span>
                 </div>
-                <div class="quest-title">${quest.title}</div>
-                <div class="quest-description">${quest.description}</div>
+                <div class="quest-title">${escapeHtml(quest.title)}</div>
+                <div class="quest-description">${escapeHtml(quest.description)}</div>
                 <div>
                     <button class="complete-btn" onclick="completeQuest(${quest.quest_id})" ${isCompleted ? 'disabled' : ''}>
                         ${isCompleted ? '✓ Completed' : 'Mark as Complete'}
@@ -764,9 +910,19 @@
         });
     }
 
+    // Escape HTML to avoid injection when rendering user-provided custom quests
+    function escapeHtml(text) {
+        return String(text)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+
     // Start a quest: show the active quest screen (blank-like UI with gradient) and hide the board
     function startQuest(questId) {
-        const quest = currentQuests.find(q => q.quest_id === questId);
+        const quest = currentQuests.find(q => Number(q.quest_id) === Number(questId));
         const activeScreen = document.getElementById('active-quest-screen');
 
         if (!activeScreen) return;
@@ -819,9 +975,13 @@
     });
 
     // Complete a quest (also used by active-screen completion)
+    // Custom quests give 5 coins; regular/generated quests give 10 coins.
     function completeQuest(questId) {
         localStorage.setItem('quest_' + questId, 'completed');
+
         const questCard = document.querySelector(`[data-quest-id="${questId}"]`);
+        let questObj = null;
+
         if (questCard) {
             const statusSpan = questCard.querySelector('.quest-status');
             const completeBtn = questCard.querySelector('.complete-btn');
@@ -834,10 +994,20 @@
                 completeBtn.disabled = true;
                 completeBtn.textContent = '✓ Completed';
             }
+
+            if (questCard.getAttribute('data-custom') === 'true') {
+                questObj = { category: 'custom' };
+            }
         }
 
-        // Award coins for completing quest
-        const coinsEarned = 10;
+        // If we didn't find the card DOM, try to find the quest in currentQuests
+        if (!questObj) {
+            const found = currentQuests.find(q => Number(q.quest_id) === Number(questId));
+            if (found) questObj = found;
+        }
+
+        // Decide coin amount
+        const coinsEarned = (questObj && questObj.category === 'custom') ? 5 : 10;
         coins += coinsEarned;
         updateCoins();
 
@@ -1036,10 +1206,9 @@
     function buyQuestMaster() {
         // The user requested this to simply show that purchase is currently unavailable.
         alert('currently unable to purchase, please try again next time');
-        // Optionally we could disable the button briefly to prevent repeated clicks:
+        // Optionally disable the specific button briefly to reduce repeated clicks
         const btns = document.querySelectorAll('.shop-item .buy-btn');
-        // Only disable the specific QuestMaster button for a short time to improve UX
-        const qmButton = Array.from(btns).find(b => b.textContent && b.textContent.includes('QuestMaster'));
+        const qmButton = Array.from(btns).find(b => b && b.parentElement && b.parentElement.querySelector('.shop-item-name') && b.parentElement.querySelector('.shop-item-name').textContent === 'QuestMaster');
         if (qmButton) {
             qmButton.disabled = true;
             setTimeout(() => { qmButton.disabled = false; }, 2000);
@@ -1059,195 +1228,198 @@
         loadShop(); // Refresh shop display
     }
 
-// Quest generation logic
-const QUEST_TEMPLATES = {
-    cardio: [
-        { activity: "Run", units: "minutes", range: [10, 30] },
-        { activity: "Walk", units: "minutes", range: [15, 45] },
-        { activity: "Jump rope", units: "minutes", range: [5, 15] },
-        { activity: "Cycling", units: "minutes", range: [15, 40] },
-        { activity: "Swimming", units: "minutes", range: [10, 30] },
-        { activity: "Dancing", units: "minutes", range: [15, 30] }
-    ],
-    strength: [
-        { activity: "Push-ups", units: "reps", range: [10, 50] },
-        { activity: "Squats", units: "reps", range: [15, 60] },
-        { activity: "Lunges", units: "reps", range: [10, 40] },
-        { activity: "Plank hold", units: "seconds", range: [30, 120] },
-        { activity: "Wall sits", units: "seconds", range: [30, 90] },
-        { activity: "Burpees", units: "reps", range: [10, 30] },
-        { activity: "Mountain climbers", units: "reps", range: [20, 60] },
-        { activity: "Sit-ups", units: "reps", range: [15, 50] },
-        { activity: "Pull-ups", units: "reps", range: [5, 20] }
-    ],
-    flexibility: [
-        { activity: "Yoga session", units: "minutes", range: [10, 30] },
-        { activity: "Stretching routine", units: "minutes", range: [10, 20] },
-        { activity: "Foam rolling", units: "minutes", range: [5, 15] }
-    ],
-    wellness: [
-        { activity: "Drink water", units: "glasses", range: [6, 10] },
-        { activity: "Meditate", units: "minutes", range: [5, 20] },
-        { activity: "Sleep", units: "hours", range: [7, 9] },
-        { activity: "Take deep breaths", units: "cycles", range: [5, 15] },
-        { activity: "Go Outside and Touch Grass", units: "minutes", range: [10, 30] }
-    ]
-};
+    // Quest generation logic (unchanged)
+    const QUEST_TEMPLATES = {
+        cardio: [
+            { activity: "Run", units: "minutes", range: [10, 30] },
+            { activity: "Walk", units: "minutes", range: [15, 45] },
+            { activity: "Jump rope", units: "minutes", range: [5, 15] },
+            { activity: "Cycling", units: "minutes", range: [15, 40] },
+            { activity: "Swimming", units: "minutes", range: [10, 30] },
+            { activity: "Dancing", units: "minutes", range: [15, 30] }
+        ],
+        strength: [
+            { activity: "Push-ups", units: "reps", range: [10, 50] },
+            { activity: "Squats", units: "reps", range: [15, 60] },
+            { activity: "Lunges", units: "reps", range: [10, 40] },
+            { activity: "Plank hold", units: "seconds", range: [30, 120] },
+            { activity: "Wall sits", units: "seconds", range: [30, 90] },
+            { activity: "Burpees", units: "reps", range: [10, 30] },
+            { activity: "Mountain climbers", units: "reps", range: [20, 60] },
+            { activity: "Sit-ups", units: "reps", range: [15, 50] },
+            { activity: "Pull-ups", units: "reps", range: [5, 20] }
+        ],
+        flexibility: [
+            { activity: "Yoga session", units: "minutes", range: [10, 30] },
+            { activity: "Stretching routine", units: "minutes", range: [10, 20] },
+            { activity: "Foam rolling", units: "minutes", range: [5, 15] }
+        ],
+        wellness: [
+            { activity: "Drink water", units: "glasses", range: [6, 10] },
+            { activity: "Meditate", units: "minutes", range: [5, 20] },
+            { activity: "Sleep", units: "hours", range: [7, 9] },
+            { activity: "Take deep breaths", units: "cycles", range: [5, 15] },
+            { activity: "Go Outside and Touch Grass", units: "minutes", range: [10, 30] }
+        ]
+    };
 
-const SHOP_ITEMS = {
-    avatars: [
-        { id: "avatar_1", name: "Fitness Pro", emoji: "🏋️", price: 50, type: "avatar" },
-        { id: "avatar_2", name: "Yoga Master", emoji: "🧘", price: 50, type: "avatar" },
-        { id: "avatar_3", name: "Runner", emoji: "🏃", price: 50, type: "avatar" },
-        { id: "avatar_4", name: "Cyclist", emoji: "🚴", price: 75, type: "avatar" },
-        { id: "avatar_5", name: "Swimmer", emoji: "🏊", price: 75, type: "avatar" },
-        { id: "avatar_6", name: "Champion", emoji: "🏆", price: 100, type: "avatar" },
-        { id: "avatar_7", name: "Martial Artist", emoji: "🥋", price: 100, type: "avatar" },
-        { id: "avatar_8", name: "Boxer", emoji: "🥊", price: 100, type: "avatar" }
-    ],
-    cosmetics: [
-        { id: "border_1", name: "Gold Border", emoji: "✨", price: 30, type: "border", color: "#ffd700" },
-        { id: "border_2", name: "Silver Border", emoji: "⭐", price: 20, type: "border", color: "#c0c0c0" },
-        { id: "border_3", name: "Bronze Border", emoji: "🔶", price: 10, type: "border", color: "#cd7f32" },
-        { id: "border_4", name: "Rainbow Border", emoji: "🌈", price: 150, type: "border", color: "linear-gradient(90deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #8b00ff)" },
-        { id: "title_1", name: "Beginner", emoji: "🌱", price: 5, type: "title" },
-        { id: "title_2", name: "Warrior", emoji: "⚔️", price: 50, type: "title" },
-        { id: "title_3", name: "Legend", emoji: "👑", price: 100, type: "title" },
-        { id: "title_4", name: "sigma", emoji: "🗿", price: 67410000, type: "title" }
-    ],
-    vip_crates: [
-        { id: "bronze_crate", name: "Bronze VIP Crate", emoji: "📦", price: 100, type: "crate", vip_required: 1, description: "Basic VIP crate with common rewards" },
-        { id: "silver_crate", name: "Silver VIP Crate", emoji: "🎁", price: 250, type: "crate", vip_required: 2, description: "Advanced VIP crate with uncommon and rare rewards" },
-        { id: "gold_crate", name: "Gold VIP Crate", emoji: "🏆", price: 500, type: "crate", vip_required: 3, description: "Premium VIP crate with epic and legendary rewards" },
-        { id: "platinum_crate", name: "Platinum VIP Crate", emoji: "💫", price: 1000, type: "crate", vip_required: 5, description: "Ultimate VIP crate with guaranteed legendary rewards" }
-    ]
-};
+    const SHOP_ITEMS = {
+        avatars: [
+            { id: "avatar_1", name: "Fitness Pro", emoji: "🏋️", price: 50, type: "avatar" },
+            { id: "avatar_2", name: "Yoga Master", emoji: "🧘", price: 50, type: "avatar" },
+            { id: "avatar_3", name: "Runner", emoji: "🏃", price: 50, type: "avatar" },
+            { id: "avatar_4", name: "Cyclist", emoji: "🚴", price: 75, type: "avatar" },
+            { id: "avatar_5", name: "Swimmer", emoji: "🏊", price: 75, type: "avatar" },
+            { id: "avatar_6", name: "Champion", emoji: "🏆", price: 100, type: "avatar" },
+            { id: "avatar_7", name: "Martial Artist", emoji: "🥋", price: 100, type: "avatar" },
+            { id: "avatar_8", name: "Boxer", emoji: "🥊", price: 100, type: "avatar" }
+        ],
+        cosmetics: [
+            { id: "border_1", name: "Gold Border", emoji: "✨", price: 30, type: "border", color: "#ffd700" },
+            { id: "border_2", name: "Silver Border", emoji: "⭐", price: 20, type: "border", color: "#c0c0c0" },
+            { id: "border_3", name: "Bronze Border", emoji: "🔶", price: 10, type: "border", color: "#cd7f32" },
+            { id: "border_4", name: "Rainbow Border", emoji: "🌈", price: 150, type: "border", color: "linear-gradient(90deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #8b00ff)" },
+            { id: "title_1", name: "Beginner", emoji: "🌱", price: 5, type: "title" },
+            { id: "title_2", name: "Warrior", emoji: "⚔️", price: 50, type: "title" },
+            { id: "title_3", name: "Legend", emoji: "👑", price: 100, type: "title" },
+            { id: "title_4", name: "sigma", emoji: "🗿", price: 67410000, type: "title" }
+        ],
+        vip_crates: [
+            { id: "bronze_crate", name: "Bronze VIP Crate", emoji: "📦", price: 100, type: "crate", vip_required: 1, description: "Basic VIP crate with common rewards" },
+            { id: "silver_crate", name: "Silver VIP Crate", emoji: "🎁", price: 250, type: "crate", vip_required: 2, description: "Advanced VIP crate with uncommon and rare rewards" },
+            { id: "gold_crate", name: "Gold VIP Crate", emoji: "🏆", price: 500, type: "crate", vip_required: 3, description: "Premium VIP crate with epic and legendary rewards" },
+            { id: "platinum_crate", name: "Platinum VIP Crate", emoji: "💫", price: 1000, type: "crate", vip_required: 5, description: "Ultimate VIP crate with guaranteed legendary rewards" }
+        ]
+    };
 
-const VIP_CRATES = {
-    bronze_crate: {
-        rewards: [
-            { item: "Common Avatar", type: "avatar", emoji: "👤", probability: 0.50, rarity: "common" },
-            { item: "Basic Border", type: "border", emoji: "⬜", probability: 0.30, rarity: "common" },
-            { item: "50 Bonus Points", type: "points", emoji: "💰", value: 50, probability: 0.15, rarity: "uncommon" },
-            { item: "Epic Title", type: "title", emoji: "🎯", probability: 0.05, rarity: "rare" }
-        ]
-    },
-    silver_crate: {
-        rewards: [
-            { item: "Rare Avatar", type: "avatar", emoji: "🦸", probability: 0.40, rarity: "uncommon" },
-            { item: "Premium Border", type: "border", emoji: "🔷", probability: 0.30, rarity: "uncommon" },
-            { item: "150 Bonus Points", type: "points", emoji: "💎", value: 150, probability: 0.20, rarity: "rare" },
-            { item: "Legendary Title", type: "title", emoji: "👑", probability: 0.08, rarity: "epic" },
-            { item: "Mystery Reward", type: "special", emoji: "❓", probability: 0.02, rarity: "legendary" }
-        ]
-    },
-    gold_crate: {
-        rewards: [
-            { item: "Epic Avatar", type: "avatar", emoji: "🌟", probability: 0.35, rarity: "rare" },
-            { item: "Diamond Border", type: "border", emoji: "💠", probability: 0.25, rarity: "epic" },
-            { item: "300 Bonus Points", type: "points", emoji: "🔥", value: 300, probability: 0.20, rarity: "epic" },
-            { item: "Ultimate Title", type: "title", emoji: "⚡", probability: 0.15, rarity: "epic" },
-            { item: "Exclusive Avatar Pack", type: "avatar_pack", emoji: "🎭", probability: 0.04, rarity: "legendary" },
-            { item: "Jackpot 1000 Points", type: "points", emoji: "💸", value: 1000, probability: 0.01, rarity: "legendary" }
-        ]
-    },
-    platinum_crate: {
-        rewards: [
-            { item: "Legendary Avatar", type: "avatar", emoji: "🔱", probability: 0.30, rarity: "legendary" },
-            { item: "Cosmic Border", type: "border", emoji: "🌌", probability: 0.25, rarity: "legendary" },
-            { item: "500 Bonus Points", type: "points", emoji: "💵", value: 500, probability: 0.20, rarity: "legendary" },
-            { item: "Divine Title", type: "title", emoji: "✨", probability: 0.15, rarity: "legendary" },
-            { item: "Ultimate Pack", type: "ultimate_pack", emoji: "🎪", probability: 0.08, rarity: "mythic" },
-            { item: "MEGA JACKPOT 5000 Points", type: "points", emoji: "🏅", value: 5000, probability: 0.02, rarity: "mythic" }
-        ]
+    const VIP_CRATES = {
+        bronze_crate: {
+            rewards: [
+                { item: "Common Avatar", type: "avatar", emoji: "👤", probability: 0.50, rarity: "common" },
+                { item: "Basic Border", type: "border", emoji: "⬜", probability: 0.30, rarity: "common" },
+                { item: "50 Bonus Points", type: "points", emoji: "💰", value: 50, probability: 0.15, rarity: "uncommon" },
+                { item: "Epic Title", type: "title", emoji: "🎯", probability: 0.05, rarity: "rare" }
+            ]
+        },
+        silver_crate: {
+            rewards: [
+                { item: "Rare Avatar", type: "avatar", emoji: "🦸", probability: 0.40, rarity: "uncommon" },
+                { item: "Premium Border", type: "border", emoji: "🔷", probability: 0.30, rarity: "uncommon" },
+                { item: "150 Bonus Points", type: "points", emoji: "💎", value: 150, probability: 0.20, rarity: "rare" },
+                { item: "Legendary Title", type: "title", emoji: "👑", probability: 0.08, rarity: "epic" },
+                { item: "Mystery Reward", type: "special", emoji: "❓", probability: 0.02, rarity: "legendary" }
+            ]
+        },
+        gold_crate: {
+            rewards: [
+                { item: "Epic Avatar", type: "avatar", emoji: "🌟", probability: 0.35, rarity: "rare" },
+                { item: "Diamond Border", type: "border", emoji: "💠", probability: 0.25, rarity: "epic" },
+                { item: "300 Bonus Points", type: "points", emoji: "🔥", value: 300, probability: 0.20, rarity: "epic" },
+                { item: "Ultimate Title", type: "title", emoji: "⚡", probability: 0.15, rarity: "epic" },
+                { item: "Exclusive Avatar Pack", type: "avatar_pack", emoji: "🎭", probability: 0.04, rarity: "legendary" },
+                { item: "Jackpot 1000 Points", type: "points", emoji: "💸", value: 1000, probability: 0.01, rarity: "legendary" }
+            ]
+        },
+        platinum_crate: {
+            rewards: [
+                { item: "Legendary Avatar", type: "avatar", emoji: "🔱", probability: 0.30, rarity: "legendary" },
+                { item: "Cosmic Border", type: "border", emoji: "🌌", probability: 0.25, rarity: "legendary" },
+                { item: "500 Bonus Points", type: "points", emoji: "💵", value: 500, probability: 0.20, rarity: "legendary" },
+                { item: "Divine Title", type: "title", emoji: "✨", probability: 0.15, rarity: "legendary" },
+                { item: "Ultimate Pack", type: "ultimate_pack", emoji: "🎪", probability: 0.08, rarity: "mythic" },
+                { item: "MEGA JACKPOT 5000 Points", type: "points", emoji: "🏅", value: 5000, probability: 0.02, rarity: "mythic" }
+            ]
+        }
+    };
+
+    function generateRandomQuests(count = 6, categoryFilter = 'all') {
+        const quests = [];
+        const categories = Object.keys(QUEST_TEMPLATES);
+
+        // Normalize filter
+        const filter = (categoryFilter || 'all').toLowerCase();
+
+        for (let i = 0; i < count; i++) {
+            // Determine category: if filter is 'all' pick random, otherwise use filter
+            const category = (filter === 'all' || !QUEST_TEMPLATES[filter]) ? categories[Math.floor(Math.random() * categories.length)] : filter;
+            const templates = QUEST_TEMPLATES[category];
+            const template = templates[Math.floor(Math.random() * templates.length)];
+            const amount = Math.floor(Math.random() * (template.range[1] - template.range[0] + 1)) + template.range[0];
+
+            // Use a more unique quest_id so that multiple refreshes don't collide with stored quest_ keys
+            const questId = Date.now() + i + Math.floor(Math.random() * 1000);
+
+            quests.push({
+                quest_id: questId,
+                title: `${template.activity} Challenge`,
+                description: `Complete ${amount} ${template.units} of ${template.activity.toLowerCase()}`,
+                category: category,
+                status: "active"
+            });
+        }
+
+        return quests;
     }
-};
 
-function generateRandomQuests(count = 6, categoryFilter = 'all') {
-    const quests = [];
-    const categories = Object.keys(QUEST_TEMPLATES);
+    function openCrate(crateId, userVipLevel) {
+        if (!VIP_CRATES[crateId]) {
+            return { error: "Invalid crate ID" };
+        }
 
-    // Normalize filter
-    const filter = (categoryFilter || 'all').toLowerCase();
+        const crate = VIP_CRATES[crateId];
+        const rewards = crate.rewards;
+        const randomValue = Math.random();
+        let cumulativeProbability = 0.0;
 
-    for (let i = 0; i < count; i++) {
-        // Determine category: if filter is 'all' pick random, otherwise use filter
-        const category = (filter === 'all' || !QUEST_TEMPLATES[filter]) ? categories[Math.floor(Math.random() * categories.length)] : filter;
-        const templates = QUEST_TEMPLATES[category];
-        const template = templates[Math.floor(Math.random() * templates.length)];
-        const amount = Math.floor(Math.random() * (template.range[1] - template.range[0] + 1)) + template.range[0];
+        for (const reward of rewards) {
+            cumulativeProbability += reward.probability;
+            if (randomValue <= cumulativeProbability) {
+                return {
+                    success: true,
+                    reward: reward,
+                    message: `You received: ${reward.emoji} ${reward.item}!`
+                };
+            }
+        }
 
-        // Use a more unique quest_id so that multiple refreshes don't collide with stored quest_ keys
-        const questId = Date.now() + i + Math.floor(Math.random() * 1000);
+        return {
+            success: true,
+            reward: rewards[rewards.length - 1],
+            message: `You received: ${rewards[rewards.length - 1].emoji} ${rewards[rewards.length - 1].item}!`
+        };
+    }
 
-        quests.push({
-            quest_id: questId,
-            title: `${template.activity} Challenge`,
-            description: `Complete ${amount} ${template.units} of ${template.activity.toLowerCase()}`,
-            category: category,
-            status: "active"
+    window.questBoardAPI = {
+        generateRandomQuests,
+        getShopItems: () => SHOP_ITEMS,
+        openCrate
+    };
+
+    // Refresh quests button: clear local quest completion markers and load new quests using selected filter
+    document.getElementById('refresh-quests').addEventListener('click', function() {
+        // Clear completed quests from localStorage (quest_ keys)
+        Object.keys(localStorage).forEach(key => {
+            if (key.startsWith('quest_')) {
+                localStorage.removeItem(key);
+            }
+        });
+        loadQuests();
+    });
+
+    // When filter changes, reload quests
+    const filterSelect = document.getElementById('quest-filter');
+    if (filterSelect) {
+        filterSelect.addEventListener('change', function() {
+            loadQuests();
         });
     }
 
-    return quests;
-}
-
-function openCrate(crateId, userVipLevel) {
-    if (!VIP_CRATES[crateId]) {
-        return { error: "Invalid crate ID" };
-    }
-
-    const crate = VIP_CRATES[crateId];
-    const rewards = crate.rewards;
-    const randomValue = Math.random();
-    let cumulativeProbability = 0.0;
-
-    for (const reward of rewards) {
-        cumulativeProbability += reward.probability;
-        if (randomValue <= cumulativeProbability) {
-            return {
-                success: true,
-                reward: reward,
-                message: `You received: ${reward.emoji} ${reward.item}!`
-            };
-        }
-    }
-
-    return {
-        success: true,
-        reward: rewards[rewards.length - 1],
-        message: `You received: ${rewards[rewards.length - 1].emoji} ${rewards[rewards.length - 1].item}!`
-    };
-}
-
-window.questBoardAPI = {
-    generateRandomQuests,
-    getShopItems: () => SHOP_ITEMS,
-    openCrate
-};
-
-// Refresh quests button: clear local quest completion markers and load new quests using selected filter
-document.getElementById('refresh-quests').addEventListener('click', function() {
-    // Clear completed quests from localStorage (quest_ keys)
-    Object.keys(localStorage).forEach(key => {
-        if (key.startsWith('quest_')) {
-            localStorage.removeItem(key);
-        }
-    });
+    // Ensure UI shows stored coins and profile on load (if user already logged in in this session)
+    updateCoins();
+    updateProfile();
+    // If user is already logged in (main-content visible in session), load quests too:
+    // but we only have login to show main-content; call loadQuests to initialize anyway
     loadQuests();
-});
-
-// When filter changes, reload quests
-const filterSelect = document.getElementById('quest-filter');
-if (filterSelect) {
-    filterSelect.addEventListener('change', function() {
-        loadQuests();
-    });
-}
-
-// Ensure UI shows stored coins and profile on load (if user already logged in in this session)
-updateCoins();
-updateProfile();
 </script>
 
 </body>
