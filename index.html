@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Quest Board</title>
     <script type="module" src="/main.js"></script>
     <style>
@@ -118,6 +118,23 @@
         .complete-btn:disabled {
             background: #cccccc;
             cursor: not-allowed;
+        }
+
+        .start-btn {
+            background: #2196f3;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 10px;
+            margin-left: 10px;
+            transition: background 0.3s;
+        }
+
+        .start-btn:hover {
+            background: #1976d2;
         }
 
         .refresh-btn {
@@ -417,6 +434,76 @@
             outline: none;
             border-color: #667eea;
         }
+
+        /* Active quest full-screen view */
+        #active-quest-screen {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 3000;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            color: white;
+        }
+
+        #active-quest-screen .active-quest-card {
+            width: 100%;
+            max-width: 800px;
+            background: linear-gradient(135deg, #bdbdbd 0%, #667eea 100%); /* gray -> blue gradient */
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.35);
+            text-align: center;
+            color: #fff;
+        }
+
+        #active-quest-screen .active-quest-title {
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 12px;
+        }
+
+        #active-quest-screen .active-quest-description {
+            font-size: 18px;
+            color: rgba(255,255,255,0.9);
+            margin-bottom: 28px;
+        }
+
+        #active-quest-screen .mark-complete-btn {
+            background: #4caf50;
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 8px;
+            font-weight: 800;
+            font-size: 18px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        #active-quest-screen .mark-complete-btn:hover {
+            background: #3f9a3f;
+        }
+
+        #active-quest-screen .cancel-quest-btn {
+            background: rgba(255,255,255,0.15);
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            margin-left: 12px;
+        }
+
+        @media (max-width: 600px) {
+            #active-quest-screen .active-quest-card { padding: 22px; }
+            #active-quest-screen .active-quest-title { font-size: 22px; }
+            #active-quest-screen .mark-complete-btn { width: 100%; display: block; margin-bottom: 8px; }
+            #active-quest-screen .cancel-quest-btn { width: 100%; display: block; margin-top: 8px; }
+        }
     </style>
 </head>
 <body>
@@ -494,6 +581,18 @@
     </div>
 </div>
 
+<!-- Active Quest Fullscreen View -->
+<div id="active-quest-screen" role="dialog" aria-modal="true">
+    <div class="active-quest-card" role="document">
+        <div class="active-quest-title">Quest Title</div>
+        <div class="active-quest-description">Quest description goes here</div>
+        <div>
+            <button id="mark-complete-btn" class="mark-complete-btn">Mark Quest as Completed</button>
+            <button id="cancel-quest-btn" class="cancel-quest-btn">Back to Board</button>
+        </div>
+    </div>
+</div>
+
 <!-- Shop Modal -->
 <div id="shop-modal" class="shop-modal">
     <div class="shop-content">
@@ -501,7 +600,7 @@
             <h2 style="margin: 0;">🛒 Quest Shop</h2>
             <span class="shop-close" id="shop-close">&times;</span>
         </div>
-        
+
         <div style="text-align: center; margin-bottom: 30px;">
             <div class="coin-display" style="font-size: 24px;">
                 <span>💰</span>
@@ -535,15 +634,17 @@
 </div>
 
 <script>
-    // Initialize coins
+    // Global state
     let coins = parseInt(localStorage.getItem('coins')) || 0;
     let ownedItems = JSON.parse(localStorage.getItem('ownedItems')) || [];
     let equippedAvatar = localStorage.getItem('equippedAvatar') || '👤';
     let equippedTitle = localStorage.getItem('equippedTitle') || '';
+    let currentQuests = []; // store currently generated quests so startQuest can find them
 
     // Update coin display
     function updateCoins() {
-        document.getElementById('coin-count').textContent = coins;
+        const coinElem = document.getElementById('coin-count');
+        if (coinElem) coinElem.textContent = coins;
         const shopCoin = document.getElementById('shop-coin-count');
         if (shopCoin) shopCoin.textContent = coins;
         localStorage.setItem('coins', coins);
@@ -551,25 +652,27 @@
 
     // Update avatar and title display
     function updateProfile() {
-        document.getElementById('user-avatar').textContent = equippedAvatar;
-        document.getElementById('user-title').textContent = equippedTitle;
+        const avatarElem = document.getElementById('user-avatar');
+        if (avatarElem) avatarElem.textContent = equippedAvatar;
+        const titleElem = document.getElementById('user-title');
+        if (titleElem) titleElem.textContent = equippedTitle;
     }
 
     // Login functionality
     document.getElementById('loginForm').addEventListener('submit', function(e) {
         e.preventDefault();
-        
+
         const username = document.getElementById('username').value;
         const password = document.getElementById('password').value;
         const errorMessage = document.getElementById('error-message');
-        
+
         // Simple validation (in production, this should be server-side)
         if (username && password) {
             // Hide login page and show main content
             document.getElementById('login-page').style.display = 'none';
             document.getElementById('main-content').style.display = 'block';
             document.getElementById('user_status').textContent = 'Welcome, ' + username + '!';
-            
+
             // Load quests and update UI
             updateCoins();
             updateProfile();
@@ -616,6 +719,7 @@
 
         const filter = document.getElementById('quest-filter') ? document.getElementById('quest-filter').value : 'all';
         const quests = window.questBoardAPI.generateRandomQuests(6, filter);
+        currentQuests = quests; // store the current set so startQuest can look them up
         const questList = document.getElementById('quest-list');
         questList.innerHTML = '';
 
@@ -635,38 +739,100 @@
                 </div>
                 <div class="quest-title">${quest.title}</div>
                 <div class="quest-description">${quest.description}</div>
-                <button class="complete-btn" onclick="completeQuest(${quest.quest_id})" ${isCompleted ? 'disabled' : ''}>
-                    ${isCompleted ? '✓ Completed' : 'Mark as Complete'}
-                </button>
+                <div>
+                    <button class="complete-btn" onclick="completeQuest(${quest.quest_id})" ${isCompleted ? 'disabled' : ''}>
+                        ${isCompleted ? '✓ Completed' : 'Mark as Complete'}
+                    </button>
+                    <button class="start-btn" onclick="startQuest(${quest.quest_id})">▶ Start</button>
+                </div>
             `;
             questList.appendChild(questCard);
         });
     }
 
-    // Complete a quest
+    // Start a quest: show the active quest screen (blank-like UI with gradient) and hide the board
+    function startQuest(questId) {
+        const quest = currentQuests.find(q => q.quest_id === questId);
+        const activeScreen = document.getElementById('active-quest-screen');
+
+        if (!activeScreen) return;
+
+        // populate with quest info (if available)
+        const titleEl = activeScreen.querySelector('.active-quest-title');
+        const descEl = activeScreen.querySelector('.active-quest-description');
+        if (quest) {
+            if (titleEl) titleEl.textContent = quest.title;
+            if (descEl) descEl.textContent = quest.description;
+        } else {
+            if (titleEl) titleEl.textContent = 'Active Quest';
+            if (descEl) descEl.textContent = 'Complete this quest and mark it as completed when finished.';
+        }
+
+        activeScreen.setAttribute('data-active-quest-id', questId);
+        // hide the main board and show active quest
+        document.getElementById('main-content').style.display = 'none';
+        activeScreen.style.display = 'flex';
+        // focus the complete button for keyboard users
+        const btn = document.getElementById('mark-complete-btn');
+        if (btn) btn.focus();
+    }
+
+    // Cancel / go back to board without marking complete
+    document.getElementById('cancel-quest-btn').addEventListener('click', function() {
+        const activeScreen = document.getElementById('active-quest-screen');
+        activeScreen.style.display = 'none';
+        document.getElementById('main-content').style.display = 'block';
+    });
+
+    // Mark the active quest as completed (called from the active screen)
+    document.getElementById('mark-complete-btn').addEventListener('click', function() {
+        const activeScreen = document.getElementById('active-quest-screen');
+        const questIdAttr = activeScreen.getAttribute('data-active-quest-id');
+        if (!questIdAttr) {
+            // nothing active, just return to board
+            activeScreen.style.display = 'none';
+            document.getElementById('main-content').style.display = 'block';
+            return;
+        }
+
+        const questId = Number(questIdAttr);
+        // Use the same complete flow as the board button
+        completeQuest(questId);
+
+        // hide active screen and return to board
+        activeScreen.style.display = 'none';
+        document.getElementById('main-content').style.display = 'block';
+    });
+
+    // Complete a quest (also used by active-screen completion)
     function completeQuest(questId) {
         localStorage.setItem('quest_' + questId, 'completed');
         const questCard = document.querySelector(`[data-quest-id="${questId}"]`);
-        if (!questCard) return;
-        const statusSpan = questCard.querySelector('.quest-status');
-        const completeBtn = questCard.querySelector('.complete-btn');
-        
-        statusSpan.className = 'quest-status completed';
-        statusSpan.textContent = 'COMPLETED';
-        completeBtn.disabled = true;
-        completeBtn.textContent = '✓ Completed';
-        
+        if (questCard) {
+            const statusSpan = questCard.querySelector('.quest-status');
+            const completeBtn = questCard.querySelector('.complete-btn');
+
+            if (statusSpan) {
+                statusSpan.className = 'quest-status completed';
+                statusSpan.textContent = 'COMPLETED';
+            }
+            if (completeBtn) {
+                completeBtn.disabled = true;
+                completeBtn.textContent = '✓ Completed';
+            }
+        }
+
         // Award coins for completing quest
         const coinsEarned = 10;
         coins += coinsEarned;
         updateCoins();
-        
+
         // Show celebration message
         const celebration = document.createElement('div');
         celebration.style.cssText = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #4caf50; color: white; padding: 20px 40px; border-radius: 10px; font-size: 24px; z-index: 2000; text-align: center;';
         celebration.innerHTML = `🎉 Quest Completed! 🎉<br><span style="font-size: 18px;">+${coinsEarned} coins 💰</span>`;
         document.body.appendChild(celebration);
-        
+
         setTimeout(() => {
             celebration.remove();
         }, 2500);
@@ -684,12 +850,12 @@
     function renderCrateItems(crates, containerId) {
         const container = document.getElementById(containerId);
         container.innerHTML = '';
-        
+
         crates.forEach(crate => {
             const crateDiv = document.createElement('div');
             crateDiv.className = 'shop-item';
             crateDiv.style.cursor = 'pointer';
-            
+
             crateDiv.innerHTML = `
                 <div class="shop-item-emoji">${crate.emoji}</div>
                 <div class="shop-item-name">${crate.name}</div>
@@ -698,7 +864,7 @@
                 <div style="font-size: 11px; color: #666; margin-top: 5px;">${crate.description}</div>
                 <button class="buy-btn" onclick="openCrate('${crate.id}', ${crate.price}, ${crate.vip_required})">Open Crate</button>
             `;
-            
+
             container.appendChild(crateDiv);
         });
     }
@@ -707,12 +873,12 @@
     function openCrate(crateId, price, vipRequired) {
         // For demo purposes, let's assume user has VIP level 5 (can access all crates)
         const userVipLevel = parseInt(localStorage.getItem('vipLevel')) || 5;
-        
+
         if (coins < price) {
             alert('Not enough coins! You need ' + price + ' coins to open this crate.');
             return;
         }
-        
+
         // Deduct coins
         coins -= price;
         updateCoins();
@@ -797,15 +963,15 @@
     function renderShopItems(items, containerId, itemType) {
         const container = document.getElementById(containerId);
         container.innerHTML = '';
-        
+
         items.forEach(item => {
             const owned = ownedItems.includes(item.id);
             const equipped = (itemType === 'avatar' && equippedAvatar === item.emoji) ||
                             (item.type === 'title' && equippedTitle === item.emoji + ' ' + item.name);
-            
+
             const itemDiv = document.createElement('div');
             itemDiv.className = 'shop-item' + (owned ? ' owned' : '') + (equipped ? ' equipped' : '');
-            
+
             let buttonHTML = '';
             if (!owned) {
                 buttonHTML = `<button class="buy-btn" onclick="buyItem('${item.id}', ${item.price}, '${itemType}')">Buy - ${item.price} 💰</button>`;
@@ -816,14 +982,14 @@
             } else {
                 buttonHTML = `<button class="buy-btn" disabled>Owned ✓</button>`;
             }
-            
+
             itemDiv.innerHTML = `
                 <div class="shop-item-emoji">${item.emoji}</div>
                 <div class="shop-item-name">${item.name}</div>
                 <div class="shop-item-price">${owned ? 'Owned' : item.price + ' coins'}</div>
                 ${buttonHTML}
             `;
-            
+
             container.appendChild(itemDiv);
         });
     }
@@ -837,13 +1003,13 @@
             localStorage.setItem('ownedItems', JSON.stringify(ownedItems));
             updateCoins();
             loadShop(); // Refresh shop display
-            
+
             // Show purchase success
             const message = document.createElement('div');
             message.style.cssText = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #4caf50; color: white; padding: 20px 40px; border-radius: 10px; font-size: 20px; z-index: 2000; text-align: center;';
             message.textContent = '✓ Purchase Successful!';
             document.body.appendChild(message);
-            
+
             setTimeout(() => {
                 message.remove();
             }, 1500);
@@ -864,7 +1030,7 @@
         updateProfile();
         loadShop(); // Refresh shop display
     }
-    
+
 // Quest generation logic
 const QUEST_TEMPLATES = {
     cardio: [
@@ -1031,29 +1197,29 @@ window.questBoardAPI = {
     getShopItems: () => SHOP_ITEMS,
     openCrate
 };
-    
-    // Refresh quests button: clear local quest completion markers and load new quests using selected filter
-    document.getElementById('refresh-quests').addEventListener('click', function() {
-        // Clear completed quests from localStorage (quest_ keys)
-        Object.keys(localStorage).forEach(key => {
-            if (key.startsWith('quest_')) {
-                localStorage.removeItem(key);
-            }
-        });
+
+// Refresh quests button: clear local quest completion markers and load new quests using selected filter
+document.getElementById('refresh-quests').addEventListener('click', function() {
+    // Clear completed quests from localStorage (quest_ keys)
+    Object.keys(localStorage).forEach(key => {
+        if (key.startsWith('quest_')) {
+            localStorage.removeItem(key);
+        }
+    });
+    loadQuests();
+});
+
+// When filter changes, reload quests
+const filterSelect = document.getElementById('quest-filter');
+if (filterSelect) {
+    filterSelect.addEventListener('change', function() {
         loadQuests();
     });
+}
 
-    // When filter changes, reload quests
-    const filterSelect = document.getElementById('quest-filter');
-    if (filterSelect) {
-        filterSelect.addEventListener('change', function() {
-            loadQuests();
-        });
-    }
-
-    // Ensure UI shows stored coins and profile on load (if user already logged in in this session)
-    updateCoins();
-    updateProfile();
+// Ensure UI shows stored coins and profile on load (if user already logged in in this session)
+updateCoins();
+updateProfile();
 </script>
 
 </body>
