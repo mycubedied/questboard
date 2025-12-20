@@ -609,6 +609,20 @@
             </div>
         </div>
 
+        <!-- New Special Offer: QuestMaster -->
+        <div class="shop-section">
+            <h3>🔥 Special Offer</h3>
+            <div class="shop-items">
+                <div class="shop-item">
+                    <div class="shop-item-emoji">🧭</div>
+                    <div class="shop-item-name">QuestMaster</div>
+                    <div class="shop-item-price">$6.99</div>
+                    <div style="font-size: 12px; color: #666; margin-top: 8px;">Unlock special QuestMaster features</div>
+                    <button class="buy-btn" onclick="buyQuestMaster()">Buy QuestMaster - $6.99</button>
+                </div>
+            </div>
+        </div>
+
         <div class="shop-section">
             <h3>🎭 Avatars</h3>
             <div class="shop-items" id="avatars-grid">
@@ -1015,6 +1029,20 @@
             }, 1500);
         } else {
             alert('Not enough coins! Complete more quests to earn coins.');
+        }
+    }
+
+    // New: Buy QuestMaster special offer (shows unavailable message)
+    function buyQuestMaster() {
+        // The user requested this to simply show that purchase is currently unavailable.
+        alert('currently unable to purchase, please try again next time');
+        // Optionally we could disable the button briefly to prevent repeated clicks:
+        const btns = document.querySelectorAll('.shop-item .buy-btn');
+        // Only disable the specific QuestMaster button for a short time to improve UX
+        const qmButton = Array.from(btns).find(b => b.textContent && b.textContent.includes('QuestMaster'));
+        if (qmButton) {
+            qmButton.disabled = true;
+            setTimeout(() => { qmButton.disabled = false; }, 2000);
         }
     }
 
