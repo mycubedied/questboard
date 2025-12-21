@@ -359,10 +359,76 @@
           100% { transform: translateY(-220px) rotate(300deg); opacity: 0; }
         }
 
+        /* --- Quest complete overlay (NEW) --- */
+        .quest-complete-overlay {
+            position: fixed;
+            inset: 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0,0,0,0.55);
+            z-index: 6500;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 260ms ease;
+        }
+        .quest-complete-overlay.show {
+            display: flex;
+            pointer-events: auto;
+            opacity: 1;
+        }
+        .qc-card {
+            background: linear-gradient(135deg,#4caf50,#81c784);
+            color: white;
+            padding: 26px 34px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 14px 50px rgba(0,0,0,0.45);
+            transform: scale(.98);
+            animation: qcPop 420ms cubic-bezier(.2,.9,.2,1) forwards;
+            min-width: 300px;
+        }
+        @keyframes qcPop {
+            from { transform: scale(.92) translateY(8px); opacity: 0; }
+            to   { transform: scale(1) translateY(0); opacity: 1; }
+        }
+        .qc-title { font-size: 22px; font-weight: 900; margin-bottom: 8px; }
+        .qc-sub { font-size: 15px; opacity: 0.95; margin-bottom: 12px; }
+        .qc-coins { font-size: 20px; font-weight: 900; display:flex; gap:10px; align-items:center; justify-content:center; }
+        .qc-coin {
+            background: #ffd700;
+            color: #333;
+            padding: 8px 12px;
+            border-radius: 50px;
+            font-weight: 900;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+            transform-origin: center;
+            animation: coinPop 900ms cubic-bezier(.2,.9,.2,1);
+        }
+        @keyframes coinPop {
+            0% { transform: translateY(6px) scale(.8); opacity: 0; }
+            40% { transform: translateY(-12px) scale(1.12); opacity: 1; }
+            100% { transform: translateY(0) scale(1); opacity: 1; }
+        }
+        /* small confetti for qc overlay */
+        .qc-confetti {
+            position: absolute;
+            width: 10px;
+            height: 12px;
+            border-radius: 2px;
+            opacity: 0.95;
+            animation: qcConfetti 1000ms cubic-bezier(.18,.8,.25,1) forwards;
+        }
+        @keyframes qcConfetti {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            50% { transform: translateY(-120px) rotate(180deg); opacity: 1; }
+            100% { transform: translateY(-260px) rotate(360deg); opacity: 0; }
+        }
+
         /* reduced motion preference */
         @media (prefers-reduced-motion: reduce) {
-            .login-confetti { animation-duration: 1ms !important; opacity: 0 !important; }
-            .login-animation-card { animation: none !important; transform: none !important; }
+            .login-confetti, .qc-confetti { animation-duration: 1ms !important; opacity: 0 !important; }
+            .login-animation-card, .qc-card { animation: none !important; transform: none !important; }
         }
     </style>
 </head>
@@ -459,6 +525,9 @@
         </div>
     </div>
 </div>
+
+<!-- Quest complete overlay (created/used by JS) -->
+<div id="quest-complete-overlay" class="quest-complete-overlay" aria-hidden="true"></div>
 
 <!-- Shop Modal -->
 <div id="shop-modal" class="shop-modal" aria-hidden="true">
@@ -639,6 +708,10 @@
             { id: "gold_crate", name: "Gold VIP Crate", emoji: "🏆", price: 500, type: "crate", vip_required: 3, description: "Premium VIP crate with epic and legendary rewards" },
             { id: "platinum_crate", name: "Platinum VIP Crate", emoji: "💫", price: 1000, type: "crate", vip_required: 5, description: "Ultimate VIP crate with guaranteed legendary rewards" }
         ]
+    };
+
+    const VIP_CRATES = {
+        // kept minimal for demo
     };
 
     // Utility: date string YYYY-MM-DD
@@ -951,15 +1024,19 @@
         document.getElementById('main-content').style.display = 'block';
     });
 
-    // Mark active quest completed
+    // Mark active quest completed — updated to show animation when finished via "Start"
     document.getElementById('mark-complete-btn').addEventListener('click', function(){
         const activeScreen = document.getElementById('active-quest-screen');
         const questIdAttr = activeScreen.getAttribute('data-active-quest-id');
         if (!questIdAttr) { activeScreen.style.display = 'none'; document.getElementById('main-content').style.display = 'block'; return; }
         const questId = Number(questIdAttr);
-        completeQuest(questId);
-        activeScreen.style.display = 'none';
-        document.getElementById('main-content').style.display = 'block';
+
+        // show an animated celebration, then complete the quest and return to board
+        showQuestCompleteAnimation(questId, function() {
+            // hide active screen and return to main board
+            activeScreen.style.display = 'none';
+            document.getElementById('main-content').style.display = 'block';
+        });
     });
 
     // Complete quest (handles custom coin amount + streak bonus)
@@ -995,14 +1072,17 @@
         coins += coinsEarned;
         updateCoins();
 
-        // celebration with breakdown
-        const celebration = document.createElement('div');
-        celebration.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#4caf50;color:white;padding:20px 30px;border-radius:10px;font-size:18px;z-index:2000;text-align:center;font-weight:700;';
-        celebration.innerHTML = `🎉 Quest Completed!<br><span style="font-size:16px;">+${base} base coins${bonus>0?(' +'+bonus+' streak bonus'):''} = <strong>+${coinsEarned} coins</strong></span>`;
-        document.body.appendChild(celebration);
-        setTimeout(()=>celebration.remove(), 2600);
+        // celebration with breakdown — shown only when not suppressed by an external animation
+        if (!window.QUIET_COMPLETE) {
+            const celebration = document.createElement('div');
+            celebration.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#4caf50;color:white;padding:20px 30px;border-radius:10px;font-size:18px;z-index:2000;text-align:center;font-weight:700;';
+            celebration.innerHTML = `🎉 Quest Completed!<br><span style="font-size:16px;">+${base} base coins${bonus>0?(' +'+bonus+' streak bonus'):''} = <strong>+${coinsEarned} coins</strong></span>`;
+            document.body.appendChild(celebration);
+            setTimeout(()=>celebration.remove(), 2600);
+        }
 
         updateStreakUI();
+        return coinsEarned;
     }
     window.completeQuest = completeQuest;
 
@@ -1181,6 +1261,85 @@
             }, 260);
         }, totalMs);
     }
+
+    // --- Quest completion animation (NEW) ---
+    // When user finishes a quest via the "Start" flow (fullscreen active quest),
+    // show a full-screen celebratory animation, then call completeQuest (quietly)
+    function showQuestCompleteAnimation(questId, cb) {
+        const overlay = document.getElementById('quest-complete-overlay');
+        if (!overlay) {
+            // fallback: just complete and callback
+            completeQuest(questId);
+            if (typeof cb === 'function') cb();
+            return;
+        }
+
+        // create card content
+        overlay.innerHTML = ''; // clear
+        overlay.classList.add('show');
+        overlay.setAttribute('aria-hidden', 'false');
+
+        const card = document.createElement('div');
+        card.className = 'qc-card';
+        const title = document.createElement('div');
+        title.className = 'qc-title';
+        title.textContent = 'Quest Completed!';
+        const sub = document.createElement('div');
+        sub.className = 'qc-sub';
+        sub.textContent = 'Great job — rewards incoming.';
+        const coinsBox = document.createElement('div');
+        coinsBox.className = 'qc-coins';
+        coinsBox.innerHTML = `<div class="qc-coin">+<span id="qc-coin-amount">0</span> 💰</div>`;
+
+        card.appendChild(title);
+        card.appendChild(sub);
+        card.appendChild(coinsBox);
+        overlay.appendChild(card);
+
+        // small confetti burst
+        const colors = ['#ffd700', '#ff6b6b', '#6bf0c4', '#8e9bff', '#ffd9a8'];
+        const pieces = 18;
+        const created = [];
+        for (let i = 0; i < pieces; i++) {
+            const c = document.createElement('div');
+            c.className = 'qc-confetti';
+            const left = Math.random() * 80 + 10; // 10% - 90%
+            c.style.left = left + '%';
+            c.style.background = colors[Math.floor(Math.random() * colors.length)];
+            c.style.animationDelay = (Math.random() * 240) + 'ms';
+            // random horizontal translation via transform; we let keyframes handle vertical
+            overlay.appendChild(c);
+            created.push(c);
+        }
+
+        // Suppress the small inline celebration in completeQuest while we run our animation
+        window.QUIET_COMPLETE = true;
+
+        // call completeQuest immediately so coins and streaks update (but its celebration is suppressed)
+        const coinsEarned = completeQuest(questId);
+
+        // update number in overlay
+        const qcAmount = document.getElementById('qc-coin-amount');
+        if (qcAmount) qcAmount.textContent = coinsEarned;
+
+        // animation duration
+        const totalMs = 1600;
+        // after animation, clean up & callback
+        setTimeout(() => {
+            // remove confetti pieces
+            created.forEach(el => el.remove());
+            overlay.classList.remove('show');
+            overlay.setAttribute('aria-hidden', 'true');
+            // small delay to allow fade-out
+            setTimeout(() => {
+                // restore celebration behavior
+                window.QUIET_COMPLETE = false;
+                overlay.innerHTML = '';
+                if (typeof cb === 'function') cb();
+            }, 260);
+        }, totalMs);
+    }
+    window.showQuestCompleteAnimation = showQuestCompleteAnimation;
 
     // Initialize UI on page load
     document.addEventListener('DOMContentLoaded', function() {
