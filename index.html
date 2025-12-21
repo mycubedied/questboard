@@ -152,6 +152,19 @@
         }
         .shop-btn:hover { background: #f57c00; }
 
+        .terms-btn {
+            background: #607d8b;
+            color: white;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-left: 8px;
+            font-size: 14px;
+        }
+        .terms-btn:hover { background: #546e7a; }
+
         .shop-modal {
             display: none;
             position: fixed;
@@ -234,14 +247,7 @@
         .streak-badge { background: linear-gradient(90deg,#ff7043,#ffca28); color: white; padding:6px 12px; border-radius:999px; font-weight:bold; font-size:14px; display:inline-flex; align-items:center; gap:8px; }
         .streak-help { font-size:12px; color:#444; opacity:0.85; }
 
-        /* Background preview box inside shop items */
-        .bg-preview {
-            width:100%;
-            height:70px;
-            border-radius:8px;
-            margin-bottom:10px;
-            border:1px solid rgba(0,0,0,0.06);
-        }
+        .bg-preview { width:100%; height:70px; border-radius:8px; margin-bottom:10px; border:1px solid rgba(0,0,0,0.06); }
 
         /* Active quest full-screen view */
         #active-quest-screen { display:none; position:fixed; inset:0; z-index:3000; align-items:center; justify-content:center; padding:24px; color:white; }
@@ -256,6 +262,39 @@
         #active-quest-screen .mark-complete-btn:hover { background:#3f9a3f; }
         #active-quest-screen .cancel-quest-btn { background: rgba(255,255,255,0.15); color:white; border:none; padding:10px 18px; border-radius:8px; font-weight:700; font-size:14px; cursor:pointer; margin-left:12px; }
 
+        /* Terms modal */
+        #terms-modal {
+            display: none;
+            position: fixed;
+            z-index: 4000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+        #terms-modal .terms-content {
+            width: 100%;
+            max-width: 900px;
+            max-height: 85vh;
+            overflow-y: auto;
+            background: white;
+            border-radius: 12px;
+            padding: 24px 28px;
+            color: #222;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+        }
+        #terms-modal .terms-header { display:flex; justify-content:space-between; align-items:center; margin-bottom: 12px; }
+        #terms-modal .terms-header h2 { margin:0; color:#333; font-size:20px; }
+        #terms-modal .terms-close { font-size:24px; cursor:pointer; color:#666; border:none; background:none; }
+        #terms-modal .terms-body { font-size:14px; color:#333; line-height:1.5; }
+        #terms-modal .terms-body h3 { margin-top: 14px; color:#222; }
+        #terms-modal .terms-footer { margin-top: 14px; text-align: right; }
+        #terms-modal .terms-ok { background:#667eea; color:white; border:none; padding:8px 14px; border-radius:6px; cursor:pointer; }
+
         @media (max-width:600px) {
             #active-quest-screen .active-quest-card { padding:22px; }
             #active-quest-screen .active-quest-title { font-size:22px; }
@@ -263,6 +302,7 @@
             #active-quest-screen .cancel-quest-btn { width:100%; display:block; margin-top:8px; }
             .custom-quest-form { flex-direction:column; align-items:stretch; }
             .streak-info { align-items:center; }
+            #terms-modal .terms-content { padding:16px; }
         }
     </style>
 </head>
@@ -314,6 +354,7 @@
                 </div>
                 <div>
                     <button id="shop-btn" class="shop-btn">🛒 Shop</button>
+                    <button id="terms-btn" class="terms-btn">Terms &amp; Conditions</button>
                     <button id="logout-btn" style="padding:8px 20px; background:#f44336; color:white; border:none; border-radius:5px; cursor:pointer;">Logout</button>
                 </div>
             </div>
@@ -385,26 +426,84 @@
             </div>
         </div>
 
-        <!-- New Backgrounds Section -->
+        <!-- Backgrounds -->
         <div class="shop-section">
             <h3>🖼️ Backgrounds</h3>
-            <div class="shop-items" id="backgrounds-grid"><!-- backgrounds injected here --></div>
+            <div class="shop-items" id="backgrounds-grid"></div>
         </div>
 
         <div class="shop-section">
             <h3>🎭 Avatars</h3>
-            <div class="shop-items" id="avatars-grid"><!-- avatars here --></div>
+            <div class="shop-items" id="avatars-grid"></div>
         </div>
 
         <div class="shop-section">
             <h3>✨ Cosmetics</h3>
-            <div class="shop-items" id="cosmetics-grid"><!-- cosmetics here --></div>
+            <div class="shop-items" id="cosmetics-grid"></div>
         </div>
 
         <div class="shop-section">
             <h3>📦 VIP Crates</h3>
             <p style="color:#666; font-size:14px; margin-bottom:15px;">Special crates with random rewards! VIP level required to open.</p>
-            <div class="shop-items" id="crates-grid"><!-- crates here --></div>
+            <div class="shop-items" id="crates-grid"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Terms & Conditions Modal -->
+<div id="terms-modal" role="dialog" aria-modal="true">
+    <div class="terms-content" role="document" aria-labelledby="terms-title">
+        <div class="terms-header">
+            <h2 id="terms-title">Terms and Conditions</h2>
+            <button class="terms-close" id="terms-close" aria-label="Close terms">&times;</button>
+        </div>
+        <div class="terms-body">
+            <h3>Introduction</h3>
+            <p>Welcome to QuestBoard! QuestBoard (“the App”) is a health application designed to help users build healthy habits through fun, RPG-style gamification. By accessing or using QuestBoard, you agree to be bound by these terms and conditions.</p>
+
+            <h3>User Eligibility</h3>
+            <p>QuestBoard is intended for individuals aged 13 and older. Users under 18 must have parental consent to register and use the App.</p>
+
+            <h3>App Purpose</h3>
+            <p>QuestBoard is a health app with game elements, encouraging users to form and sustain healthy habits through quests, coins, and social/group features.</p>
+
+            <h3>Acceptable Use</h3>
+            <p>Users must not use the App for unlawful or abusive purposes.</p>
+            <p>Health tracking features, including planned smartwatch and fitness-tracker sync, are intended only for personal wellness; the App is not a substitute for professional medical advice.</p>
+            <p>Users are responsible for the information they enter and share, especially in social/group quests.</p>
+
+            <h3>User-Generated Content</h3>
+            <p>Quests, avatars, and social interactions rely on user input.</p>
+            <p>Users retain rights to their original content but grant QuestBoard a license to use, display, and adapt content within the App.</p>
+
+            <h3>In-App Purchases</h3>
+            <p>Coins earned in-game can unlock cosmetics. Some features may offer optional purchases.</p>
+            <p>All payments are final unless specified otherwise. Refunds are subject to App Store or provider policies.</p>
+
+            <h3>Privacy and Data</h3>
+            <p>QuestBoard collects wellness and activity data for app functionality, including planned device integrations.</p>
+            <p>Data is stored securely and used to enhance user experience.</p>
+            <p>Personal and health information is never sold to third parties. Review our Privacy Policy for full details.</p>
+
+            <h3>Social Feature and Beta Testing</h3>
+            <p>Group quests are available in beta. Features may change, and beta users accept possible instability, bugs, and incomplete functionality.</p>
+
+            <h3>Intellectual Property</h3>
+            <p>All app code, graphics, and branding are owned by QuestBoard. Users must not copy or distribute App materials.</p>
+
+            <h3>Termination and Suspension</h3>
+            <p>Accounts may be suspended or terminated for violations of these terms or for misuse or abuse of the app.</p>
+
+            <h3>Limitation of Liability</h3>
+            <p>QuestBoard is not responsible for loss, injury, or failure to achieve specific health outcomes.</p>
+            <p>The App is provided “as is” without any warranties or guarantees.</p>
+
+            <h3>Changes to Terms</h3>
+            <p>QuestBoard reserves the right to update these terms. Users will be notified of significant changes within the App.</p>
+
+            <div class="terms-footer">
+                <button id="terms-ok" class="terms-ok">Close</button>
+            </div>
         </div>
     </div>
 </div>
@@ -425,7 +524,7 @@
     const STREAK_REQUIREMENT = 3;
     const STREAK_BONUS_PERCENT_PER_STREAK = 0.10;
 
-    // Mapping of background styles
+    // Background styles mapping
     const BG_STYLES = {
         bg_light_blue: '#e8f5ff', // light blue
         bg_pink: '#fff0f8', // pink
@@ -435,7 +534,7 @@
         bg_blue_pink_grad: 'linear-gradient(135deg,#e8f5ff,#fff0f8)' // light blue + pink
     };
 
-    // Shop items now include a 'backgrounds' array
+    // Shop items
     const SHOP_ITEMS = {
         backgrounds: [
             { id: "bg_light_blue", name: "Light Blue", emoji: "🟦", price: 20, type: "background" },
@@ -525,7 +624,6 @@
         const style = BG_STYLES[id];
         if (!style) return;
         document.body.style.background = style;
-        // ensure base fallback for single-color values
         if (!style.includes('gradient')) {
             document.body.style.backgroundColor = style;
         }
@@ -546,7 +644,7 @@
         streakUi.appendChild(help);
     }
 
-    // Daily completion / streak logic
+    // Daily completion & streak logic
     function incrementDailyCompletionFor(dateStr) {
         const daily = loadDailyCompletions();
         const prev = daily[dateStr] || 0;
@@ -619,6 +717,27 @@
     document.getElementById('shop-close').addEventListener('click', function(){ document.getElementById('shop-modal').style.display = 'none'; });
     window.addEventListener('click', function(event){ if (event.target == document.getElementById('shop-modal')) document.getElementById('shop-modal').style.display = 'none'; });
 
+    // Terms modal open/close
+    document.getElementById('terms-btn').addEventListener('click', function(){
+        document.getElementById('terms-modal').style.display = 'flex';
+        // focus for accessibility
+        document.getElementById('terms-close').focus();
+    });
+    document.getElementById('terms-close').addEventListener('click', function(){
+        document.getElementById('terms-modal').style.display = 'none';
+    });
+    document.getElementById('terms-ok').addEventListener('click', function(){
+        document.getElementById('terms-modal').style.display = 'none';
+    });
+    // Close terms modal when clicking outside content
+    window.addEventListener('click', function(event) {
+        const tm = document.getElementById('terms-modal');
+        if (!tm) return;
+        if (event.target === tm) {
+            tm.style.display = 'none';
+        }
+    });
+
     // Add custom quest
     document.getElementById('add-custom-quest').addEventListener('click', function(){
         const titleInput = document.getElementById('custom-title');
@@ -642,14 +761,13 @@
         const customQuests = loadCustomQuestsFromStorage();
         const filtered = customQuests.filter(q => Number(q.quest_id) !== Number(questId));
         saveCustomQuestsToStorage(filtered);
-        // Remove completion record for clean state
         try { localStorage.removeItem('quest_' + questId); } catch(e){}
         showMessage('Custom quest deleted');
         loadQuests();
     }
     window.deleteCustomQuest = deleteCustomQuest;
 
-    // Load quests (generated + custom)
+    // Load quests
     function loadQuests() {
         const questList = document.getElementById('quest-list');
         questList.innerHTML = '<p style="text-align:center;color:#666">Loading quests...</p>';
@@ -671,7 +789,6 @@
             questCard.setAttribute('data-quest-id', quest.quest_id);
             if (quest.category === 'custom') questCard.setAttribute('data-custom','true');
             const isCompleted = localStorage.getItem('quest_' + quest.quest_id) === 'completed';
-            // build inner HTML; include Delete button for custom quests
             questCard.innerHTML = `
                 <div>
                     <span class="quest-category category-${quest.category}">${quest.category}</span>
@@ -717,6 +834,7 @@
         activeScreen.style.display = 'flex';
         const btn = document.getElementById('mark-complete-btn'); if (btn) btn.focus();
     }
+    window.startQuest = startQuest;
 
     document.getElementById('cancel-quest-btn').addEventListener('click', function(){
         const activeScreen = document.getElementById('active-quest-screen');
@@ -747,7 +865,6 @@
             if (completeBtn) { completeBtn.disabled = true; completeBtn.textContent = '✓ Completed'; }
             if (questCard.getAttribute('data-custom') === 'true') isCustom = true;
         }
-        // if not found in DOM, check currentQuests/custom storage
         if (!isCustom) {
             const found = currentQuests.find(q => Number(q.quest_id) === Number(questId));
             if (found && found.category === 'custom') isCustom = true;
@@ -756,7 +873,6 @@
                 if (customQuests.find(q => Number(q.quest_id) === Number(questId))) isCustom = true;
             }
         }
-        // persist
         localStorage.setItem('quest_' + questId, 'completed');
 
         // record daily completions & streaks
@@ -780,7 +896,6 @@
         updateStreakUI();
     }
     window.completeQuest = completeQuest;
-    window.startQuest = startQuest;
 
     // Shop rendering & actions
     function loadShop() {
@@ -789,7 +904,6 @@
         renderShopItems(shopData.avatars, 'avatars-grid', 'avatar');
         renderShopItems(shopData.cosmetics, 'cosmetics-grid', 'cosmetic');
         renderCrateItems(shopData.vip_crates, 'crates-grid');
-        // ensure shop coin updated
         updateCoins();
     }
 
@@ -905,7 +1019,7 @@
     }
     window.equipItem = equipItem;
 
-    // Crate / reward functions unchanged
+    // Crate open
     function openCrate(crateId, price, vipRequired) {
         const userVipLevel = parseInt(localStorage.getItem('vipLevel')) || 5;
         if (coins < price) { alert('Not enough coins! You need ' + price + ' coins to open this crate.'); return; }
@@ -926,7 +1040,7 @@
     }
     window.openCrate = openCrate;
 
-    // Quest generator (unchanged)
+    // Quest generation (unchanged)
     const QUEST_TEMPLATES = {
         cardio: [
             { activity: "Run", units: "minutes", range: [10, 30] },
@@ -991,7 +1105,7 @@
 
     window.questBoardAPI = { generateRandomQuests, getShopItems: () => SHOP_ITEMS, openCrate: openCrate_api };
 
-    // Refresh quests: clear quest completions and reload
+    // Refresh quests
     document.getElementById('refresh-quests').addEventListener('click', function() {
         Object.keys(localStorage).forEach(key => { if (key.startsWith('quest_')) localStorage.removeItem(key); });
         loadQuests();
