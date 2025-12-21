@@ -222,7 +222,7 @@
         .form-group input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px; box-sizing: border-box; }
         .form-group input:focus { outline: none; border-color: #667eea; }
 
-        .btn-login { width: 100%; padding: 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 5px; font-size: 16px; font-weight: bold; cursor: pointer; transition: opacity 0.3s; }
+        .btn-login { width: 100%; padding: 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 5px; font-size: 16px; font-weight: bold; cursor: pointer; }
         .btn-login:hover { opacity: 0.9; }
 
         .signup-link { text-align: center; margin-top: 20px; color: #666; }
@@ -244,7 +244,7 @@
         .add-custom-btn:hover { background: #009e90; }
 
         .streak-info { display:flex; flex-direction:column; align-items:flex-end; gap:6px; }
-        .streak-badge { background: linear-gradient(90deg,#ff7043,#ffca28); color: white; padding:6px 12px; border-radius:999px; font-weight:bold; font-size:14px; display:inline-flex; align-items:center; gap:8px; }
+        .streak-badge { background: linear-gradient(90deg,#ff7043,#ffca28); color: white; padding:6px 12px; border-radius:999px; font-weight:bold; font-size:14px; display:inline-flex; align-items:center; }
         .streak-help { font-size:12px; color:#444; opacity:0.85; }
 
         .bg-preview { width:100%; height:70px; border-radius:8px; margin-bottom:10px; border:1px solid rgba(0,0,0,0.06); }
@@ -303,6 +303,66 @@
             .custom-quest-form { flex-direction:column; align-items:stretch; }
             .streak-info { align-items:center; }
             #terms-modal .terms-content { padding:16px; }
+        }
+
+        /* --- Login animation overlay (NEW) --- */
+        #login-animation-overlay {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.45));
+            z-index: 6000;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 260ms ease;
+        }
+        #login-animation-overlay.show {
+            pointer-events: auto;
+            opacity: 1;
+        }
+        .login-animation-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 28px 32px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.45);
+            transform: translateY(8px);
+            animation: popIn 420ms cubic-bezier(.2,.9,.2,1);
+            min-width: 280px;
+        }
+        .login-animation-emoji { font-size: 48px; margin-bottom: 6px; }
+        .login-animation-message { font-size: 20px; font-weight: 800; margin-bottom: 4px; }
+        .login-animation-sub { font-size: 14px; opacity: 0.95; }
+
+        @keyframes popIn {
+          from { transform: translateY(16px) scale(.96); opacity: 0; }
+          to   { transform: translateY(0) scale(1); opacity: 1; }
+        }
+
+        /* confetti pieces */
+        .login-confetti {
+          position: absolute;
+          bottom: 40%;
+          width: 10px;
+          height: 14px;
+          border-radius: 2px;
+          opacity: 0.95;
+          transform: translateY(0) rotate(0deg);
+          animation: confettiFloat var(--dur, 1200ms) cubic-bezier(.2,.8,.3,1) forwards;
+        }
+        @keyframes confettiFloat {
+          0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+          60% { transform: translateY(-90px) rotate(160deg); opacity: 1; }
+          100% { transform: translateY(-220px) rotate(300deg); opacity: 0; }
+        }
+
+        /* reduced motion preference */
+        @media (prefers-reduced-motion: reduce) {
+            .login-confetti { animation-duration: 1ms !important; opacity: 0 !important; }
+            .login-animation-card { animation: none !important; transform: none !important; }
         }
     </style>
 </head>
@@ -401,11 +461,11 @@
 </div>
 
 <!-- Shop Modal -->
-<div id="shop-modal" class="shop-modal">
-    <div class="shop-content">
+<div id="shop-modal" class="shop-modal" aria-hidden="true">
+    <div class="shop-content" role="dialog" aria-modal="true">
         <div class="shop-header">
             <h2 style="margin: 0;">🛒 Quest Shop</h2>
-            <span class="shop-close" id="shop-close">&times;</span>
+            <span class="shop-close" id="shop-close" role="button" aria-label="Close shop">&times;</span>
         </div>
 
         <div style="text-align:center; margin-bottom:30px;">
@@ -459,7 +519,7 @@
         </div>
         <div class="terms-body">
             <h3>Introduction</h3>
-            <p>Welcome to QuestBoard! QuestBoard (“the App”) is a health application designed to help users build healthy habits through fun, RPG-style gamification. By accessing or using QuestBoard, you agree to be bound by these terms and conditions.</p>
+            <p>Welcome to QuestBoard! QuestBoard (“the App”) is a health application designed to help users build healthy habits through fun, RPG-style gamification. By accessing or using QuestBoard you agree to these terms.</p>
 
             <h3>User Eligibility</h3>
             <p>QuestBoard is intended for individuals aged 13 and older. Users under 18 must have parental consent to register and use the App.</p>
@@ -469,7 +529,7 @@
 
             <h3>Acceptable Use</h3>
             <p>Users must not use the App for unlawful or abusive purposes.</p>
-            <p>Health tracking features, including planned smartwatch and fitness-tracker sync, are intended only for personal wellness; the App is not a substitute for professional medical advice.</p>
+            <p>Health tracking features are intended only for personal wellness; the App is not a substitute for professional medical advice.</p>
             <p>Users are responsible for the information they enter and share, especially in social/group quests.</p>
 
             <h3>User-Generated Content</h3>
@@ -506,6 +566,15 @@
             </div>
         </div>
     </div>
+</div>
+
+<!-- Login animation overlay (NEW) -->
+<div id="login-animation-overlay" aria-hidden="true">
+  <div class="login-animation-card" role="status" aria-live="polite">
+    <div class="login-animation-emoji">🎉</div>
+    <div class="login-animation-message">Welcome, <span id="login-username">Adventurer</span>!</div>
+    <div class="login-animation-sub">Loading your Quest Board…</div>
+  </div>
 </div>
 
 <script>
@@ -572,13 +641,6 @@
         ]
     };
 
-    const VIP_CRATES = {
-        bronze_crate: { rewards: [ { item: "Common Avatar", type: "avatar", emoji: "👤", probability: 0.50, rarity: "common" }, { item: "Basic Border", type: "border", emoji: "⬜", probability: 0.30, rarity: "common" }, { item: "50 Bonus Points", type: "points", emoji: "💰", value: 50, probability: 0.15, rarity: "uncommon" }, { item: "Epic Title", type: "title", emoji: "🎯", probability: 0.05, rarity: "rare" } ] },
-        silver_crate: { rewards: [ { item: "Rare Avatar", type: "avatar", emoji: "🦸", probability: 0.40, rarity: "uncommon" }, { item: "Premium Border", type: "border", emoji: "🔷", probability: 0.30, rarity: "uncommon" }, { item: "150 Bonus Points", type: "points", emoji: "💎", value: 150, probability: 0.20, rarity: "rare" }, { item: "Legendary Title", type: "title", emoji: "👑", probability: 0.08, rarity: "epic" }, { item: "Mystery Reward", type: "special", emoji: "❓", probability: 0.02, rarity: "legendary" } ] },
-        gold_crate: { rewards: [ { item: "Epic Avatar", type: "avatar", emoji: "🌟", probability: 0.35, rarity: "rare" }, { item: "Diamond Border", type: "border", emoji: "💠", probability: 0.25, rarity: "epic" }, { item: "300 Bonus Points", type: "points", emoji: "🔥", value: 300, probability: 0.20, rarity: "epic" }, { item: "Ultimate Title", type: "title", emoji: "⚡", probability: 0.15, rarity: "epic" }, { item: "Exclusive Avatar Pack", type: "avatar_pack", emoji: "🎭", probability: 0.04, rarity: "legendary" }, { item: "Jackpot 1000 Points", type: "points", emoji: "💸", value: 1000, probability: 0.01, rarity: "legendary" } ] },
-        platinum_crate: { rewards: [ { item: "Legendary Avatar", type: "avatar", emoji: "🔱", probability: 0.30, rarity: "legendary" }, { item: "Cosmic Border", type: "border", emoji: "🌌", probability: 0.25, rarity: "legendary" }, { item: "500 Bonus Points", type: "points", emoji: "💵", value: 500, probability: 0.20, rarity: "legendary" }, { item: "Divine Title", type: "title", emoji: "✨", probability: 0.15, rarity: "legendary" }, { item: "Ultimate Pack", type: "ultimate_pack", emoji: "🎪", probability: 0.08, rarity: "mythic" }, { item: "MEGA JACKPOT 5000 Points", type: "points", emoji: "🏅", value: 5000, probability: 0.02, rarity: "mythic" } ] }
-    };
-
     // Utility: date string YYYY-MM-DD
     function todayStr(offsetDays = 0) {
         const d = new Date();
@@ -608,7 +670,7 @@
     // UI helpers
     function showMessage(text, ms = 2200) {
         const message = document.createElement('div');
-        message.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,0.85);color:white;padding:16px 22px;border-radius:10px;z-index:9999;text-align:center;';
+        message.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,0.85);color:white;padding:16px 22px;border-radius:10px;z-index:9999;text-align:center;font-weight:700;';
         message.innerHTML = text;
         document.body.appendChild(message);
         setTimeout(()=>message.remove(), ms);
@@ -688,6 +750,42 @@
         const titleElem = document.getElementById('user-title'); if (titleElem) titleElem.textContent = equippedTitle;
     }
 
+    // Minimal questBoardAPI to keep the page functional
+    window.questBoardAPI = {
+        generateRandomQuests: function(count = 6, category = 'all') {
+            const sample = [
+                { title: "30-Minute Walk", description: "A brisk walk for 30 minutes.", category: "cardio", status: "active" },
+                { title: "Push-up Set", description: "Do 3 sets of 10 push-ups.", category: "strength", status: "active" },
+                { title: "Stretch Routine", description: "10 minutes of full-body stretching.", category: "flexibility", status: "active" },
+                { title: "Mindful Breathing", description: "5 minutes of breathing exercises.", category: "wellness", status: "active" },
+                { title: "Short Run", description: "Run for 15-20 minutes at an easy pace.", category: "cardio", status: "active" },
+                { title: "Core Workout", description: "Plank + bicycle crunches for core.", category: "strength", status: "active" }
+            ];
+            let pool = sample.slice();
+            // filter by category if needed
+            if (category !== 'all') pool = pool.filter(q => q.category === category);
+            // if filtered pool smaller than requested, use sample again
+            while (pool.length < count) pool = pool.concat(sample);
+            // build final list
+            const out = [];
+            for (let i=0;i<count;i++) {
+                const src = pool[i % pool.length];
+                out.push({
+                    quest_id: Date.now() + i + Math.floor(Math.random()*1000),
+                    title: src.title,
+                    description: src.description,
+                    category: src.category,
+                    status: src.status,
+                    custom: false
+                });
+            }
+            return out;
+        },
+        getShopItems: function() {
+            return SHOP_ITEMS;
+        }
+    };
+
     // Login
     document.getElementById('loginForm').addEventListener('submit', function(e){
         e.preventDefault();
@@ -695,10 +793,17 @@
         const password = document.getElementById('password').value;
         const errorMessage = document.getElementById('error-message');
         if (username && password) {
-            document.getElementById('login-page').style.display = 'none';
-            document.getElementById('main-content').style.display = 'block';
-            document.getElementById('user_status').textContent = 'Welcome, ' + username + '!';
-            updateCoins(); updateProfile(); updateStreakUI(); applyBackground(equippedBackground); loadQuests();
+            // Play the login animation and only reveal the main UI when it's done
+            showLoginAnimation(username, function() {
+                document.getElementById('login-page').style.display = 'none';
+                document.getElementById('main-content').style.display = 'block';
+                document.getElementById('user_status').textContent = 'Welcome, ' + username + '!';
+                updateCoins();
+                updateProfile();
+                updateStreakUI();
+                applyBackground(equippedBackground);
+                loadQuests();
+            });
         } else { errorMessage.textContent = 'Please enter both username and password'; }
     });
 
@@ -810,6 +915,10 @@
         });
     }
 
+    document.getElementById('refresh-quests').addEventListener('click', function(){ loadQuests(); });
+
+    document.getElementById('quest-filter').addEventListener('change', function(){ loadQuests(); });
+
     // Escape HTML for user input
     function escapeHtml(text) {
         return String(text)
@@ -888,7 +997,7 @@
 
         // celebration with breakdown
         const celebration = document.createElement('div');
-        celebration.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#4caf50;color:white;padding:20px 30px;border-radius:10px;font-size:18px;z-index:2000;text-align:center;';
+        celebration.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#4caf50;color:white;padding:20px 30px;border-radius:10px;font-size:18px;z-index:2000;text-align:center;font-weight:700;';
         celebration.innerHTML = `🎉 Quest Completed!<br><span style="font-size:16px;">+${base} base coins${bonus>0?(' +'+bonus+' streak bonus'):''} = <strong>+${coinsEarned} coins</strong></span>`;
         document.body.appendChild(celebration);
         setTimeout(()=>celebration.remove(), 2600);
@@ -983,13 +1092,13 @@
     function buyItem(itemId, price, itemType) {
         if (coins >= price) {
             coins -= price;
-            ownedItems.push(itemId);
+            if (!ownedItems.includes(itemId)) ownedItems.push(itemId);
             localStorage.setItem('coins', coins);
             localStorage.setItem('ownedItems', JSON.stringify(ownedItems));
             updateCoins();
             loadShop();
             const message = document.createElement('div');
-            message.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#4caf50;color:white;padding:20px 40px;border-radius:10px;font-size:20px;z-index:2000;text-align:center;';
+            message.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#4caf50;color:white;padding:20px 40px;border-radius:10px;font-size:20px;z-index:2000;text-align:center;font-weight:700;';
             message.textContent = '✓ Purchase Successful!';
             document.body.appendChild(message);
             setTimeout(()=>message.remove(), 1500);
@@ -997,130 +1106,87 @@
     }
     window.buyItem = buyItem;
 
-    // Buy QuestMaster (unavailable)
-    function buyQuestMaster() {
-        alert('currently unable to purchase, please try again next time');
-        const btns = document.querySelectorAll('.shop-item .buy-btn');
-        const qmButton = Array.from(btns).find(b => b && b.parentElement && b.parentElement.querySelector('.shop-item-name') && b.parentElement.querySelector('.shop-item-name').textContent === 'QuestMaster');
-        if (qmButton) { qmButton.disabled = true; setTimeout(()=>{ qmButton.disabled = false; }, 2000); }
-    }
-    window.buyQuestMaster = buyQuestMaster;
-
     function equipItem(itemId, emoji, name, type) {
         if (type === 'avatar') {
             equippedAvatar = emoji;
-            localStorage.setItem('equippedAvatar', emoji);
+            localStorage.setItem('equippedAvatar', equippedAvatar);
         } else if (type === 'title') {
             equippedTitle = emoji + ' ' + name;
             localStorage.setItem('equippedTitle', equippedTitle);
         }
         updateProfile();
         loadShop();
+        showMessage('Item equipped');
     }
     window.equipItem = equipItem;
 
-    // Crate open
     function openCrate(crateId, price, vipRequired) {
-        const userVipLevel = parseInt(localStorage.getItem('vipLevel')) || 5;
-        if (coins < price) { alert('Not enough coins! You need ' + price + ' coins to open this crate.'); return; }
-        coins -= price; updateCoins(); localStorage.setItem('coins', coins);
-        const result = window.questBoardAPI.openCrate(crateId, userVipLevel);
-        if (result.error) { alert('Error: ' + result.error); coins += price; updateCoins(); localStorage.setItem('coins', coins); return; }
-        const reward = result.reward;
-        const rewardDiv = document.createElement('div');
-        rewardDiv.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:linear-gradient(135deg,#667eea,#764ba2);color:white;padding:40px 60px;border-radius:15px;font-size:24px;font-weight:bold;z-index:2000;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,0.3);animation:bounce 0.5s ease;';
-        const rarityColors = { 'common':'#9e9e9e','uncommon':'#4caf50','rare':'#2196f3','epic':'#9c27b0','legendary':'#ff9800','mythic':'#f44336' };
-        rewardDiv.innerHTML = `<div style="font-size:64px;margin-bottom:20px;">${reward.emoji}</div><div style="font-size:28px;margin-bottom:10px;">${reward.item}</div><div style="font-size:16px;color:${rarityColors[reward.rarity]||'#fff'};text-transform:uppercase;letter-spacing:2px;">${reward.rarity||''}</div>${reward.type === 'points' ? `<div style="font-size:20px;margin-top:15px;">+${reward.value} coins 💰</div>` : ''}`;
-        document.body.appendChild(rewardDiv);
-        const styleEl = document.createElement('style');
-        styleEl.textContent = `@keyframes bounce { 0%,100%{ transform:translate(-50%,-50%) scale(1);} 50%{ transform:translate(-50%,-50%) scale(1.1);} }`;
-        document.head.appendChild(styleEl);
-        if (reward.type === 'points' && reward.value) { coins += reward.value; updateCoins(); localStorage.setItem('coins', coins); }
-        setTimeout(()=>{ rewardDiv.remove(); styleEl.remove(); }, 3500);
+        if (coins < price) { alert('Not enough coins to open this crate.'); return; }
+        coins -= price;
+        updateCoins();
+        // simple random reward simulation
+        const rewards = ["avatar_1","border_1","title_1","avatar_3"];
+        const reward = rewards[Math.floor(Math.random()*rewards.length)];
+        if (!ownedItems.includes(reward)) ownedItems.push(reward);
+        localStorage.setItem('ownedItems', JSON.stringify(ownedItems));
+        loadShop();
+        showMessage('🎁 Crate opened! You received: ' + reward);
     }
     window.openCrate = openCrate;
 
-    // Quest generation (unchanged)
-    const QUEST_TEMPLATES = {
-        cardio: [
-            { activity: "Run", units: "minutes", range: [10, 30] },
-            { activity: "Walk", units: "minutes", range: [15, 45] },
-            { activity: "Jump rope", units: "minutes", range: [5, 15] },
-            { activity: "Cycling", units: "minutes", range: [15, 40] },
-            { activity: "Swimming", units: "minutes", range: [10, 30] },
-            { activity: "Dancing", units: "minutes", range: [15, 30] }
-        ],
-        strength: [
-            { activity: "Push-ups", units: "reps", range: [10, 50] },
-            { activity: "Squats", units: "reps", range: [15, 60] },
-            { activity: "Lunges", units: "reps", range: [10, 40] },
-            { activity: "Plank hold", units: "seconds", range: [30, 120] },
-            { activity: "Wall sits", units: "seconds", range: [30, 90] },
-            { activity: "Burpees", units: "reps", range: [10, 30] },
-            { activity: "Mountain climbers", units: "reps", range: [20, 60] },
-            { activity: "Sit-ups", units: "reps", range: [15, 50] },
-            { activity: "Pull-ups", units: "reps", range: [5, 20] }
-        ],
-        flexibility: [
-            { activity: "Yoga session", units: "minutes", range: [10, 30] },
-            { activity: "Stretching routine", units: "minutes", range: [10, 20] },
-            { activity: "Foam rolling", units: "minutes", range: [5, 15] }
-        ],
-        wellness: [
-            { activity: "Drink water", units: "glasses", range: [6, 10] },
-            { activity: "Meditate", units: "minutes", range: [5, 20] },
-            { activity: "Sleep", units: "hours", range: [7, 9] },
-            { activity: "Take deep breaths", units: "cycles", range: [5, 15] },
-            { activity: "Go Outside and Touch Grass", units: "minutes", range: [10, 30] }
-        ]
-    };
-
-    function generateRandomQuests(count = 6, categoryFilter = 'all') {
-        const quests = [];
-        const categories = Object.keys(QUEST_TEMPLATES);
-        const filter = (categoryFilter || 'all').toLowerCase();
-        for (let i = 0; i < count; i++) {
-            const category = (filter === 'all' || !QUEST_TEMPLATES[filter]) ? categories[Math.floor(Math.random() * categories.length)] : filter;
-            const templates = QUEST_TEMPLATES[category];
-            const template = templates[Math.floor(Math.random() * templates.length)];
-            const amount = Math.floor(Math.random() * (template.range[1] - template.range[0] + 1)) + template.range[0];
-            const questId = Date.now() + i + Math.floor(Math.random() * 1000);
-            quests.push({ quest_id: questId, title: `${template.activity} Challenge`, description: `Complete ${amount} ${template.units} of ${template.activity.toLowerCase()}`, category: category, status: "active" });
-        }
-        return quests;
+    function buyQuestMaster() {
+        alert('QuestMaster is currently unavailable in this demo.');
     }
 
-    function openCrate_api(crateId, userVipLevel) {
-        if (!VIP_CRATES[crateId]) return { error: "Invalid crate ID" };
-        const crate = VIP_CRATES[crateId];
-        const rewards = crate.rewards;
-        const randomValue = Math.random();
-        let cumulativeProbability = 0.0;
-        for (const reward of rewards) {
-            cumulativeProbability += reward.probability;
-            if (randomValue <= cumulativeProbability) return { success: true, reward: reward, message: `You received: ${reward.emoji} ${reward.item}!` };
+    // --- Login animation functions (NEW) ---
+    function showLoginAnimation(username, cb) {
+        const overlay = document.getElementById('login-animation-overlay');
+        if (!overlay) {
+            if (typeof cb === 'function') cb();
+            return;
         }
-        return { success: true, reward: rewards[rewards.length - 1], message: `You received: ${rewards[rewards.length - 1].emoji} ${rewards[rewards.length - 1].item}!` };
+        // set username in welcome message
+        const nameEl = document.getElementById('login-username');
+        if (nameEl) nameEl.textContent = username;
+
+        overlay.classList.add('show');
+
+        // create confetti pieces
+        const colors = ['#ffd700', '#ff6b6b', '#6bf0c4', '#8e9bff', '#ffd9a8'];
+        const pieces = 22;
+        const created = [];
+        for (let i = 0; i < pieces; i++) {
+            const c = document.createElement('div');
+            c.className = 'login-confetti';
+            const left = Math.random() * 80 + 10; // 10% - 90%
+            c.style.left = left + '%';
+            c.style.background = colors[Math.floor(Math.random() * colors.length)];
+            c.style.setProperty('--dur', (900 + Math.floor(Math.random() * 700)) + 'ms');
+            c.style.transform = `translateY(0) rotate(${Math.floor(Math.random()*360)}deg)`;
+            // stagger delay
+            c.style.animationDelay = (Math.random() * 220) + 'ms';
+            overlay.appendChild(c);
+            created.push(c);
+        }
+
+        // duration for the whole overlay (slightly longer than confetti animation)
+        const totalMs = 1600;
+        setTimeout(() => {
+            // clean confetti
+            created.forEach(el => el.remove());
+            overlay.classList.remove('show');
+            // small delay to allow fade-out
+            setTimeout(() => {
+                if (typeof cb === 'function') cb();
+            }, 260);
+        }, totalMs);
     }
 
-    window.questBoardAPI = { generateRandomQuests, getShopItems: () => SHOP_ITEMS, openCrate: openCrate_api };
-
-    // Refresh quests
-    document.getElementById('refresh-quests').addEventListener('click', function() {
-        Object.keys(localStorage).forEach(key => { if (key.startsWith('quest_')) localStorage.removeItem(key); });
-        loadQuests();
+    // Initialize UI on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        updateCoins(); updateProfile(); updateStreakUI(); applyBackground(equippedBackground);
+        // Preload quests when logged-in; initial state hides main content
     });
-
-    // Filter change reload
-    const filterSelect = document.getElementById('quest-filter');
-    if (filterSelect) filterSelect.addEventListener('change', function(){ loadQuests(); });
-
-    // Initialize UI on load
-    updateCoins();
-    updateProfile();
-    updateStreakUI();
-    applyBackground(equippedBackground);
-    loadQuests();
 </script>
 
 </body>
