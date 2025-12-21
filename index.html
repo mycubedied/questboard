@@ -79,30 +79,11 @@
             text-transform: uppercase;
         }
 
-        .category-cardio {
-            background: #e3f2fd;
-            color: #1976d2;
-        }
-
-        .category-strength {
-            background: #fce4ec;
-            color: #c2185b;
-        }
-
-        .category-flexibility {
-            background: #f3e5f5;
-            color: #7b1fa2;
-        }
-
-        .category-wellness {
-            background: #e8f5e9;
-            color: #388e3c;
-        }
-
-        .category-custom {
-            background: #eceff1;
-            color: #37474f;
-        }
+        .category-cardio { background: #e3f2fd; color: #1976d2; }
+        .category-strength { background: #fce4ec; color: #c2185b; }
+        .category-flexibility { background: #f3e5f5; color: #7b1fa2; }
+        .category-wellness { background: #e8f5e9; color: #388e3c; }
+        .category-custom { background: #eceff1; color: #37474f; }
 
         .complete-btn {
             background: #4caf50;
@@ -116,14 +97,8 @@
             transition: background 0.3s;
         }
 
-        .complete-btn:hover {
-            background: #45a049;
-        }
-
-        .complete-btn:disabled {
-            background: #cccccc;
-            cursor: not-allowed;
-        }
+        .complete-btn:hover { background: #45a049; }
+        .complete-btn:disabled { background: #cccccc; cursor: not-allowed; }
 
         .start-btn {
             background: #2196f3;
@@ -138,9 +113,7 @@
             transition: background 0.3s;
         }
 
-        .start-btn:hover {
-            background: #1976d2;
-        }
+        .start-btn:hover { background: #1976d2; }
 
         .refresh-btn {
             background: #667eea;
@@ -154,9 +127,7 @@
             font-size: 16px;
         }
 
-        .refresh-btn:hover {
-            background: #5568d3;
-        }
+        .refresh-btn:hover { background: #5568d3; }
 
         .coin-display {
             background: #ffd700;
@@ -182,9 +153,7 @@
             margin-left: 10px;
         }
 
-        .shop-btn:hover {
-            background: #f57c00;
-        }
+        .shop-btn:hover { background: #f57c00; }
 
         .shop-modal {
             display: none;
@@ -217,27 +186,11 @@
             padding-bottom: 15px;
         }
 
-        .shop-close {
-            font-size: 32px;
-            font-weight: bold;
-            color: #999;
-            cursor: pointer;
-            transition: color 0.3s;
-        }
+        .shop-close { font-size: 32px; font-weight: bold; color: #999; cursor: pointer; transition: color 0.3s; }
+        .shop-close:hover { color: #333; }
 
-        .shop-close:hover {
-            color: #333;
-        }
-
-        .shop-section {
-            margin-bottom: 30px;
-        }
-
-        .shop-section h3 {
-            color: #667eea;
-            margin-bottom: 15px;
-        }
-
+        .shop-section { margin-bottom: 30px; }
+        .shop-section h3 { color: #667eea; margin-bottom: 15px; }
         .shop-items {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -260,77 +213,21 @@
             box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
         }
 
-        .shop-item.owned {
-            border-color: #4caf50;
-            background: #e8f5e9;
-        }
+        .shop-item.owned { border-color: #4caf50; background: #e8f5e9; }
+        .shop-item.equipped { border-color: #ffd700; background: #fffde7; }
+        .shop-item-emoji { font-size: 48px; margin-bottom: 10px; }
+        .shop-item-name { font-weight: bold; margin-bottom: 5px; }
+        .shop-item-price { color: #ffd700; font-weight: bold; font-size: 16px; }
 
-        .shop-item.equipped {
-            border-color: #ffd700;
-            background: #fffde7;
-        }
+        .buy-btn { background: #4caf50; color: white; border: none; padding: 8px 20px; border-radius: 5px; cursor: pointer; margin-top: 10px; font-weight: bold; }
+        .buy-btn:hover { background: #45a049; }
+        .buy-btn:disabled { background: #ccc; cursor: not-allowed; }
 
-        .shop-item-emoji {
-            font-size: 48px;
-            margin-bottom: 10px;
-        }
+        .equip-btn { background: #2196f3; color: white; border: none; padding: 8px 20px; border-radius: 5px; cursor: pointer; margin-top: 10px; font-weight: bold; }
+        .equip-btn:hover { background: #1976d2; }
 
-        .shop-item-name {
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-
-        .shop-item-price {
-            color: #ffd700;
-            font-weight: bold;
-            font-size: 16px;
-        }
-
-        .buy-btn {
-            background: #4caf50;
-            color: white;
-            border: none;
-            padding: 8px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-top: 10px;
-            font-weight: bold;
-        }
-
-        .buy-btn:hover {
-            background: #45a049;
-        }
-
-        .buy-btn:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-        }
-
-        .equip-btn {
-            background: #2196f3;
-            color: white;
-            border: none;
-            padding: 8px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-top: 10px;
-            font-weight: bold;
-        }
-
-        .equip-btn:hover {
-            background: #1976d2;
-        }
-
-        .profile-avatar {
-            font-size: 48px;
-            margin-right: 10px;
-        }
-
-        .profile-title {
-            color: #667eea;
-            font-weight: bold;
-            margin-left: 10px;
-        }
+        .profile-avatar { font-size: 48px; margin-right: 10px; }
+        .profile-title { color: #667eea; font-weight: bold; margin-left: 10px; }
 
         .login-container {
             max-width: 400px;
@@ -341,40 +238,13 @@
             box-shadow: 0 4px 20px rgba(0,0,0,0.1);
         }
 
-        .login-header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
+        .login-header { text-align: center; margin-bottom: 30px; }
+        .login-header h2 { color: #667eea; margin: 0; }
 
-        .login-header h2 {
-            color: #667eea;
-            margin: 0;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            color: #333;
-            font-weight: 500;
-        }
-
-        .form-group input {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 14px;
-            box-sizing: border-box;
-        }
-
-        .form-group input:focus {
-            outline: none;
-            border-color: #667eea;
-        }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; color: #333; font-weight: 500; }
+        .form-group input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px; box-sizing: border-box; }
+        .form-group input:focus { outline: none; border-color: #667eea; }
 
         .btn-login {
             width: 100%;
@@ -389,56 +259,20 @@
             transition: opacity 0.3s;
         }
 
-        .btn-login:hover {
-            opacity: 0.9;
-        }
+        .btn-login:hover { opacity: 0.9; }
 
-        .signup-link {
-            text-align: center;
-            margin-top: 20px;
-            color: #666;
-        }
+        .signup-link { text-align: center; margin-top: 20px; color: #666; }
+        .signup-link a { color: #667eea; text-decoration: none; font-weight: bold; }
+        .signup-link a:hover { text-decoration: underline; }
 
-        .signup-link a {
-            color: #667eea;
-            text-decoration: none;
-            font-weight: bold;
-        }
+        .error-message { color: #f44336; font-size: 14px; margin-top: 10px; text-align: center; }
 
-        .signup-link a:hover {
-            text-decoration: underline;
-        }
+        #main-content { display: none; }
 
-        .error-message {
-            color: #f44336;
-            font-size: 14px;
-            margin-top: 10px;
-            text-align: center;
-        }
-
-        #main-content {
-            display: none;
-        }
-
-        /* New styles for quest filter dropdown */
-        .quest-controls {
-            display: flex;
-            gap: 12px;
-            align-items: center;
-        }
-
-        .quest-filter {
-            padding: 8px 12px;
-            border-radius: 6px;
-            border: 1px solid #ddd;
-            font-size: 14px;
-            background: white;
-        }
-
-        .quest-filter:focus {
-            outline: none;
-            border-color: #667eea;
-        }
+        /* New styles for quest filter dropdown and helpers */
+        .quest-controls { display: flex; gap: 12px; align-items: center; }
+        .quest-filter { padding: 8px 12px; border-radius: 6px; border: 1px solid #ddd; font-size: 14px; background: white; }
+        .quest-filter:focus { outline: none; border-color: #667eea; }
 
         /* Small form for adding custom quests */
         .custom-quest-form {
@@ -481,8 +315,32 @@
             font-weight: bold;
         }
 
-        .add-custom-btn:hover {
-            background: #009e90;
+        .add-custom-btn:hover { background: #009e90; }
+
+        /* Streak UI helper */
+        .streak-info {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 6px;
+        }
+
+        .streak-badge {
+            background: linear-gradient(90deg,#ff7043,#ffca28);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 999px;
+            font-weight: bold;
+            font-size: 14px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .streak-help {
+            font-size: 12px;
+            color: #444;
+            opacity: 0.85;
         }
 
         /* Active quest full-screen view */
@@ -532,9 +390,7 @@
             transition: background 0.2s;
         }
 
-        #active-quest-screen .mark-complete-btn:hover {
-            background: #3f9a3f;
-        }
+        #active-quest-screen .mark-complete-btn:hover { background: #3f9a3f; }
 
         #active-quest-screen .cancel-quest-btn {
             background: rgba(255,255,255,0.15);
@@ -554,6 +410,7 @@
             #active-quest-screen .mark-complete-btn { width: 100%; display: block; margin-bottom: 8px; }
             #active-quest-screen .cancel-quest-btn { width: 100%; display: block; margin-top: 8px; }
             .custom-quest-form { flex-direction: column; align-items: stretch; }
+            .streak-info { align-items: center; }
         }
     </style>
 </head>
@@ -600,14 +457,21 @@
                     <span class="profile-title" id="user-title"></span>
                 </div>
             </div>
-            <div style="display: flex; align-items: center; gap: 10px;">
-                <div class="coin-display">
-                    <span>💰</span>
-                    <span id="coin-count">0</span>
-                    <span>coins</span>
+            <div style="display:flex; align-items:center; gap:12px;">
+                <div style="display:flex; flex-direction:column; gap:6px; align-items:flex-end;">
+                    <div class="coin-display">
+                        <span>💰</span>
+                        <span id="coin-count">0</span>
+                        <span>coins</span>
+                    </div>
+                    <div id="streak-ui" class="streak-info" style="align-items:flex-end;">
+                        <!-- Streak badge & help will be injected here -->
+                    </div>
                 </div>
-                <button id="shop-btn" class="shop-btn">🛒 Shop</button>
-                <button id="logout-btn" style="padding: 8px 20px; background: #f44336; color: white; border: none; border-radius: 5px; cursor: pointer;">Logout</button>
+                <div>
+                    <button id="shop-btn" class="shop-btn">🛒 Shop</button>
+                    <button id="logout-btn" style="padding: 8px 20px; background: #f44336; color: white; border: none; border-radius: 5px; cursor: pointer;">Logout</button>
+                </div>
             </div>
         </div>
     </div>
@@ -715,22 +579,147 @@
     let equippedTitle = localStorage.getItem('equippedTitle') || '';
     let currentQuests = []; // store currently generated + custom quests so startQuest can find them
 
-    // Custom quests persistence key
+    // Keys
     const CUSTOM_QUESTS_KEY = 'customQuests_v1';
+    const DAILY_COMPLETIONS_KEY = 'dailyCompletions_v1'; // map date->count
+    const STREAK_DATA_KEY = 'streakData_v1'; // { currentStreak, bestStreak, lastStreakDate }
 
+    // Streak bonus config
+    const STREAK_REQUIREMENT = 3; // quests per day required to "earn" the day
+    const STREAK_BONUS_PERCENT_PER_STREAK = 0.10; // 10% bonus per streak
+
+    // Utility - today's date string yyyy-mm-dd
+    function todayStr(offsetDays = 0) {
+        const d = new Date();
+        d.setDate(d.getDate() + offsetDays);
+        return d.toISOString().slice(0,10);
+    }
+
+    // Load/save custom quests
     function loadCustomQuestsFromStorage() {
         try {
             const raw = localStorage.getItem(CUSTOM_QUESTS_KEY);
-            if (!raw) return [];
-            return JSON.parse(raw);
+            return raw ? JSON.parse(raw) : [];
         } catch (e) {
-            console.error('Error parsing custom quests from localStorage', e);
+            console.error('Error parsing custom quests', e);
             return [];
         }
     }
 
     function saveCustomQuestsToStorage(arr) {
         localStorage.setItem(CUSTOM_QUESTS_KEY, JSON.stringify(arr));
+    }
+
+    // Daily completions load/save
+    function loadDailyCompletions() {
+        try {
+            const raw = localStorage.getItem(DAILY_COMPLETIONS_KEY);
+            return raw ? JSON.parse(raw) : {};
+        } catch (e) {
+            console.error('Error parsing daily completions', e);
+            return {};
+        }
+    }
+
+    function saveDailyCompletions(obj) {
+        localStorage.setItem(DAILY_COMPLETIONS_KEY, JSON.stringify(obj));
+    }
+
+    // Streak data load/save
+    function loadStreakData() {
+        try {
+            const raw = localStorage.getItem(STREAK_DATA_KEY);
+            if (!raw) {
+                return { currentStreak: 0, bestStreak: 0, lastStreakDate: null };
+            }
+            return JSON.parse(raw);
+        } catch (e) {
+            console.error('Error parsing streak data', e);
+            return { currentStreak: 0, bestStreak: 0, lastStreakDate: null };
+        }
+    }
+
+    function saveStreakData(obj) {
+        localStorage.setItem(STREAK_DATA_KEY, JSON.stringify(obj));
+    }
+
+    // Update streak UI area
+    function updateStreakUI() {
+        const streakUi = document.getElementById('streak-ui');
+        const streakData = loadStreakData();
+        streakUi.innerHTML = '';
+
+        const badge = document.createElement('div');
+        badge.className = 'streak-badge';
+        badge.innerHTML = `🔥 Streak: <span id="streak-count">${streakData.currentStreak}</span>`;
+        streakUi.appendChild(badge);
+
+        const help = document.createElement('div');
+        help.className = 'streak-help';
+        help.innerHTML = `Complete ${STREAK_REQUIREMENT} quests every day to build streaks — each streak gives +${Math.round(STREAK_BONUS_PERCENT_PER_STREAK*100)}% coins per quest. Best: <strong id="best-streak">${streakData.bestStreak}</strong>`;
+        streakUi.appendChild(help);
+    }
+
+    // Increment daily completion for a date and return whether we newly reached the threshold today
+    function incrementDailyCompletionFor(dateStr) {
+        const daily = loadDailyCompletions();
+        const prev = daily[dateStr] || 0;
+        daily[dateStr] = prev + 1;
+        saveDailyCompletions(daily);
+
+        // return object with updated count and whether we've now reached threshold (and wasn't reached before)
+        return { count: daily[dateStr], reachedNow: (prev < STREAK_REQUIREMENT && daily[dateStr] >= STREAK_REQUIREMENT) };
+    }
+
+    // Check & update streaks when a date hits threshold
+    function checkAndUpdateStreakFor(dateStr) {
+        const streakData = loadStreakData();
+
+        // If we already recorded that this date was the lastStreakDate (i.e., we already processed), don't double-increment
+        if (streakData.lastStreakDate === dateStr) {
+            return streakData;
+        }
+
+        // Did yesterday have a streak (i.e., lastStreakDate === yesterday)?
+        const yesterday = todayStr(-1);
+        if (streakData.lastStreakDate === yesterday) {
+            streakData.currentStreak = (streakData.currentStreak || 0) + 1;
+        } else {
+            // start a new streak chain
+            streakData.currentStreak = 1;
+        }
+
+        streakData.lastStreakDate = dateStr;
+        if (!streakData.bestStreak || streakData.currentStreak > streakData.bestStreak) {
+            streakData.bestStreak = streakData.currentStreak;
+        }
+
+        saveStreakData(streakData);
+        updateStreakUI();
+        return streakData;
+    }
+
+    // When user completes a quest, call this to update daily counts and potentially streaks. Returns streakData if updated today, otherwise null
+    function recordCompletionAndMaybeAwardStreak() {
+        const date = todayStr();
+        const res = incrementDailyCompletionFor(date);
+        if (res.reachedNow) {
+            // Award/advance streak
+            const streakData = checkAndUpdateStreakFor(date);
+            // notify user
+            showMessage(`🎉 You completed ${STREAK_REQUIREMENT} quests today! Streak is now ${streakData.currentStreak}. +${Math.round(STREAK_BONUS_PERCENT_PER_STREAK*100)}% coins per quest per streak.`);
+            return streakData;
+        }
+        return null;
+    }
+
+    // Utility to show short messages in center
+    function showMessage(text, ms = 2200) {
+        const message = document.createElement('div');
+        message.style.cssText = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); background: rgba(0,0,0,0.8); color: white; padding: 18px 28px; border-radius: 10px; z-index: 9999; font-size: 16px; text-align:center;';
+        message.innerHTML = text;
+        document.body.appendChild(message);
+        setTimeout(() => message.remove(), ms);
     }
 
     // Update coin display
@@ -758,23 +747,21 @@
         const password = document.getElementById('password').value;
         const errorMessage = document.getElementById('error-message');
 
-        // Simple validation (in production, this should be server-side)
         if (username && password) {
-            // Hide login page and show main content
             document.getElementById('login-page').style.display = 'none';
             document.getElementById('main-content').style.display = 'block';
             document.getElementById('user_status').textContent = 'Welcome, ' + username + '!';
 
-            // Load quests and update UI
             updateCoins();
             updateProfile();
+            updateStreakUI();
             loadQuests();
         } else {
             errorMessage.textContent = 'Please enter both username and password';
         }
     });
 
-    // Logout functionality
+    // Logout
     document.getElementById('logout-btn').addEventListener('click', function() {
         document.getElementById('login-page').style.display = 'block';
         document.getElementById('main-content').style.display = 'none';
@@ -783,13 +770,13 @@
         document.getElementById('error-message').textContent = '';
     });
 
-    // Signup link
+    // Signup
     document.getElementById('signup-link').addEventListener('click', function(e) {
         e.preventDefault();
         alert('Signup functionality coming soon!');
     });
 
-    // Shop modal functionality
+    // Shop modal
     document.getElementById('shop-btn').addEventListener('click', function() {
         document.getElementById('shop-modal').style.display = 'block';
         loadShop();
@@ -831,47 +818,37 @@
             description: description,
             category: 'custom',
             status: 'active',
-            custom: true // marker
+            custom: true
         };
 
         customQuests.push(newQuest);
         saveCustomQuestsToStorage(customQuests);
 
-        // clear fields
         titleInput.value = '';
         descInput.value = '';
-
-        // reload quests
         loadQuests();
     });
 
-    // Load quests from API, optionally filtered by category, and include custom quests when appropriate
+    // Load quests (includes custom quests when appropriate)
     function loadQuests() {
         const questList = document.getElementById('quest-list');
         questList.innerHTML = '<p style="text-align: center; color: #666;">Loading quests...</p>';
 
         const filter = document.getElementById('quest-filter') ? document.getElementById('quest-filter').value : 'all';
 
-        // Generated quests (not custom)
         const generatedQuests = window.questBoardAPI.generateRandomQuests(6, filter === 'all' ? 'all' : filter);
-        // load custom quests
         const customQuests = loadCustomQuestsFromStorage();
 
         let questsToShow = [];
-
         if (filter === 'custom') {
-            // Only custom quests
-            questsToShow = customQuests.slice(); // copy
+            questsToShow = customQuests.slice();
         } else if (filter === 'all') {
-            // show generated + custom (custom at end)
             questsToShow = generatedQuests.concat(customQuests);
         } else {
-            // filter is a specific non-custom category; show only generated from that category
-            // (generateRandomQuests above already respects the filter argument, but to be safe ensure categories match)
-            questsToShow = generatedQuests.filter(q => q.category === filter).concat(customQuests.filter(q => false)); // no custom in specific filters
+            // specific non-custom category
+            questsToShow = generatedQuests.filter(q => q.category === filter);
         }
 
-        // Make sure IDs are unique — generatedQuests already use timestamp-based ids
         currentQuests = questsToShow;
         questList.innerHTML = '';
 
@@ -884,9 +861,7 @@
             const questCard = document.createElement('div');
             questCard.className = 'quest-card';
             questCard.setAttribute('data-quest-id', quest.quest_id);
-            if (quest.category === 'custom') {
-                questCard.setAttribute('data-custom', 'true');
-            }
+            if (quest.category === 'custom') questCard.setAttribute('data-custom', 'true');
 
             const isCompleted = localStorage.getItem('quest_' + quest.quest_id) === 'completed';
 
@@ -910,7 +885,7 @@
         });
     }
 
-    // Escape HTML to avoid injection when rendering user-provided custom quests
+    // Escape HTML for user input
     function escapeHtml(text) {
         return String(text)
             .replace(/&/g, '&amp;')
@@ -920,14 +895,12 @@
             .replace(/'/g, '&#039;');
     }
 
-    // Start a quest: show the active quest screen (blank-like UI with gradient) and hide the board
+    // Start a quest: show active full-screen view
     function startQuest(questId) {
         const quest = currentQuests.find(q => Number(q.quest_id) === Number(questId));
         const activeScreen = document.getElementById('active-quest-screen');
-
         if (!activeScreen) return;
 
-        // populate with quest info (if available)
         const titleEl = activeScreen.querySelector('.active-quest-title');
         const descEl = activeScreen.querySelector('.active-quest-description');
         if (quest) {
@@ -939,50 +912,45 @@
         }
 
         activeScreen.setAttribute('data-active-quest-id', questId);
-        // hide the main board and show active quest
         document.getElementById('main-content').style.display = 'none';
         activeScreen.style.display = 'flex';
-        // focus the complete button for keyboard users
         const btn = document.getElementById('mark-complete-btn');
         if (btn) btn.focus();
     }
 
-    // Cancel / go back to board without marking complete
+    // Cancel active quest (back to board)
     document.getElementById('cancel-quest-btn').addEventListener('click', function() {
         const activeScreen = document.getElementById('active-quest-screen');
         activeScreen.style.display = 'none';
         document.getElementById('main-content').style.display = 'block';
     });
 
-    // Mark the active quest as completed (called from the active screen)
+    // Mark the active quest as completed (active screen)
     document.getElementById('mark-complete-btn').addEventListener('click', function() {
         const activeScreen = document.getElementById('active-quest-screen');
         const questIdAttr = activeScreen.getAttribute('data-active-quest-id');
         if (!questIdAttr) {
-            // nothing active, just return to board
             activeScreen.style.display = 'none';
             document.getElementById('main-content').style.display = 'block';
             return;
         }
 
         const questId = Number(questIdAttr);
-        // Use the same complete flow as the board button
         completeQuest(questId);
 
-        // hide active screen and return to board
         activeScreen.style.display = 'none';
         document.getElementById('main-content').style.display = 'block';
     });
 
-    // Complete a quest (also used by active-screen completion)
-    // Custom quests give 5 coins; regular/generated quests give 10 coins.
+    // Complete a quest (board or active). Custom quests give 5 coins; generated quests give 10.
+    // Streak bonus applies: +10% per streak (rounded down).
     function completeQuest(questId) {
-        localStorage.setItem('quest_' + questId, 'completed');
-
         const questCard = document.querySelector(`[data-quest-id="${questId}"]`);
         let questObj = null;
+        let isCustom = false;
 
         if (questCard) {
+            questCard.setAttribute('data-completed', 'true');
             const statusSpan = questCard.querySelector('.quest-status');
             const completeBtn = questCard.querySelector('.complete-btn');
 
@@ -996,30 +964,50 @@
             }
 
             if (questCard.getAttribute('data-custom') === 'true') {
-                questObj = { category: 'custom' };
+                isCustom = true;
             }
         }
 
-        // If we didn't find the card DOM, try to find the quest in currentQuests
-        if (!questObj) {
+        // find quest object if possible
+        if (!isCustom) {
             const found = currentQuests.find(q => Number(q.quest_id) === Number(questId));
+            if (found) {
+                questObj = found;
+                if (found.category === 'custom') isCustom = true;
+            }
+        } else if (!questObj) {
+            // If custom but not found in currentQuests (edge case), attempt to find in storage
+            const customQuests = loadCustomQuestsFromStorage();
+            const found = customQuests.find(q => Number(q.quest_id) === Number(questId));
             if (found) questObj = found;
         }
 
-        // Decide coin amount
-        const coinsEarned = (questObj && questObj.category === 'custom') ? 5 : 10;
+        // persist completion
+        localStorage.setItem('quest_' + questId, 'completed');
+
+        // Before awarding coins, update daily completions and possibly streak
+        const streakUpdate = recordCompletionAndMaybeAwardStreak();
+        // Load current streak (after any possible update)
+        const streakData = loadStreakData();
+        const currentStreak = streakData.currentStreak || 0;
+
+        const base = (isCustom ? 5 : 10);
+        const bonus = Math.floor(base * STREAK_BONUS_PERCENT_PER_STREAK * currentStreak);
+        const coinsEarned = base + bonus;
+
         coins += coinsEarned;
         updateCoins();
 
-        // Show celebration message
+        // Show celebration message with breakdown
         const celebration = document.createElement('div');
-        celebration.style.cssText = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #4caf50; color: white; padding: 20px 40px; border-radius: 10px; font-size: 24px; z-index: 2000; text-align: center;';
-        celebration.innerHTML = `🎉 Quest Completed! 🎉<br><span style="font-size: 18px;">+${coinsEarned} coins 💰</span>`;
+        celebration.style.cssText = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #4caf50; color: white; padding: 20px 30px; border-radius: 10px; font-size: 18px; z-index: 2000; text-align: center;';
+        celebration.innerHTML = `🎉 Quest Completed!<br><span style="font-size:16px;">+${base} base coins${bonus > 0 ? ' +'+bonus+' streak bonus' : ''} = <strong>+'${coinsEarned} coins</strong></span>`;
         document.body.appendChild(celebration);
 
-        setTimeout(() => {
-            celebration.remove();
-        }, 2500);
+        setTimeout(() => { celebration.remove(); }, 2600);
+
+        // update streak UI in header
+        updateStreakUI();
     }
 
     // Load shop items
@@ -1055,7 +1043,6 @@
 
     // Open a crate
     function openCrate(crateId, price, vipRequired) {
-        // For demo purposes, let's assume user has VIP level 5 (can access all crates)
         const userVipLevel = parseInt(localStorage.getItem('vipLevel')) || 5;
 
         if (coins < price) {
@@ -1063,24 +1050,20 @@
             return;
         }
 
-        // Deduct coins
         coins -= price;
         updateCoins();
         localStorage.setItem('coins', coins);
 
-        // Call API to open crate
         const result = window.questBoardAPI.openCrate(crateId, userVipLevel);
 
         if (result.error) {
             alert('Error: ' + result.error);
-            // Refund coins if there was an error
             coins += price;
             updateCoins();
             localStorage.setItem('coins', coins);
             return;
         }
 
-        // Show reward animation
         const reward = result.reward;
         const rewardDiv = document.createElement('div');
         rewardDiv.style.cssText = `
@@ -1120,7 +1103,6 @@
 
         document.body.appendChild(rewardDiv);
 
-        // Add bounce animation
         const style = document.createElement('style');
         style.textContent = `
             @keyframes bounce {
@@ -1130,7 +1112,6 @@
         `;
         document.head.appendChild(style);
 
-        // If reward is points, add them to coins
         if (reward.type === 'points' && reward.value) {
             coins += reward.value;
             updateCoins();
@@ -1143,7 +1124,7 @@
         }, 3500);
     }
 
-    // Render shop items
+    // Render shop items (avatars/cosmetics)
     function renderShopItems(items, containerId, itemType) {
         const container = document.getElementById(containerId);
         container.innerHTML = '';
@@ -1186,27 +1167,22 @@
             localStorage.setItem('coins', coins);
             localStorage.setItem('ownedItems', JSON.stringify(ownedItems));
             updateCoins();
-            loadShop(); // Refresh shop display
+            loadShop();
 
-            // Show purchase success
             const message = document.createElement('div');
             message.style.cssText = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #4caf50; color: white; padding: 20px 40px; border-radius: 10px; font-size: 20px; z-index: 2000; text-align: center;';
             message.textContent = '✓ Purchase Successful!';
             document.body.appendChild(message);
 
-            setTimeout(() => {
-                message.remove();
-            }, 1500);
+            setTimeout(() => { message.remove(); }, 1500);
         } else {
             alert('Not enough coins! Complete more quests to earn coins.');
         }
     }
 
-    // New: Buy QuestMaster special offer (shows unavailable message)
+    // Buy QuestMaster (unavailable)
     function buyQuestMaster() {
-        // The user requested this to simply show that purchase is currently unavailable.
         alert('currently unable to purchase, please try again next time');
-        // Optionally disable the specific button briefly to reduce repeated clicks
         const btns = document.querySelectorAll('.shop-item .buy-btn');
         const qmButton = Array.from(btns).find(b => b && b.parentElement && b.parentElement.querySelector('.shop-item-name') && b.parentElement.querySelector('.shop-item-name').textContent === 'QuestMaster');
         if (qmButton) {
@@ -1225,10 +1201,10 @@
             localStorage.setItem('equippedTitle', equippedTitle);
         }
         updateProfile();
-        loadShop(); // Refresh shop display
+        loadShop();
     }
 
-    // Quest generation logic (unchanged)
+    // Quest generation logic
     const QUEST_TEMPLATES = {
         cardio: [
             { activity: "Run", units: "minutes", range: [10, 30] },
@@ -1335,18 +1311,14 @@
     function generateRandomQuests(count = 6, categoryFilter = 'all') {
         const quests = [];
         const categories = Object.keys(QUEST_TEMPLATES);
-
-        // Normalize filter
         const filter = (categoryFilter || 'all').toLowerCase();
 
         for (let i = 0; i < count; i++) {
-            // Determine category: if filter is 'all' pick random, otherwise use filter
             const category = (filter === 'all' || !QUEST_TEMPLATES[filter]) ? categories[Math.floor(Math.random() * categories.length)] : filter;
             const templates = QUEST_TEMPLATES[category];
             const template = templates[Math.floor(Math.random() * templates.length)];
             const amount = Math.floor(Math.random() * (template.range[1] - template.range[0] + 1)) + template.range[0];
 
-            // Use a more unique quest_id so that multiple refreshes don't collide with stored quest_ keys
             const questId = Date.now() + i + Math.floor(Math.random() * 1000);
 
             quests.push({
@@ -1374,30 +1346,17 @@
         for (const reward of rewards) {
             cumulativeProbability += reward.probability;
             if (randomValue <= cumulativeProbability) {
-                return {
-                    success: true,
-                    reward: reward,
-                    message: `You received: ${reward.emoji} ${reward.item}!`
-                };
+                return { success: true, reward: reward, message: `You received: ${reward.emoji} ${reward.item}!` };
             }
         }
 
-        return {
-            success: true,
-            reward: rewards[rewards.length - 1],
-            message: `You received: ${rewards[rewards.length - 1].emoji} ${rewards[rewards.length - 1].item}!`
-        };
+        return { success: true, reward: rewards[rewards.length - 1], message: `You received: ${rewards[rewards.length - 1].emoji} ${rewards[rewards.length - 1].item}!` };
     }
 
-    window.questBoardAPI = {
-        generateRandomQuests,
-        getShopItems: () => SHOP_ITEMS,
-        openCrate
-    };
+    window.questBoardAPI = { generateRandomQuests, getShopItems: () => SHOP_ITEMS, openCrate };
 
     // Refresh quests button: clear local quest completion markers and load new quests using selected filter
     document.getElementById('refresh-quests').addEventListener('click', function() {
-        // Clear completed quests from localStorage (quest_ keys)
         Object.keys(localStorage).forEach(key => {
             if (key.startsWith('quest_')) {
                 localStorage.removeItem(key);
@@ -1409,16 +1368,13 @@
     // When filter changes, reload quests
     const filterSelect = document.getElementById('quest-filter');
     if (filterSelect) {
-        filterSelect.addEventListener('change', function() {
-            loadQuests();
-        });
+        filterSelect.addEventListener('change', function() { loadQuests(); });
     }
 
-    // Ensure UI shows stored coins and profile on load (if user already logged in in this session)
+    // Initialize UI
     updateCoins();
     updateProfile();
-    // If user is already logged in (main-content visible in session), load quests too:
-    // but we only have login to show main-content; call loadQuests to initialize anyway
+    updateStreakUI();
     loadQuests();
 </script>
 
