@@ -243,7 +243,7 @@
         .add-custom-btn { background: #00bfa5; color: white; border: none; padding: 10px 16px; border-radius:6px; cursor:pointer; font-weight:bold; }
         .add-custom-btn:hover { background: #009e90; }
 
-        .streak-info { display:flex; flex-direction:column; align-items:flex-end; gap:6px; }
+        .streak_info { display:flex; flex-direction:column; align-items:flex-end; gap:6px; }
         .streak-badge { background: linear-gradient(90deg,#ff7043,#ffca28); color: white; padding:6px 12px; border-radius:999px; font-weight:bold; font-size:14px; display:inline-flex; align-items:center; }
         .streak-help { font-size:12px; color:#444; opacity:0.85; }
 
@@ -904,6 +904,88 @@
         });
     }
 
+    // Fisher-Yates shuffle
+    function shuffleArray(arr) {
+        for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+    }
+
+    // Render quest list (re-usable)
+    function renderQuestList(questsToShow) {
+        const questList = document.getElementById('quest-list');
+        questList.innerHTML = '';
+        if (!questsToShow || questsToShow.length === 0) {
+            questList.innerHTML = '<p style="text-align:center;color:#666">No quests available for the selected category.</p>';
+            return;
+        }
+
+        // create nodes
+        questsToShow.forEach(quest => {
+            const questCard = document.createElement('div');
+            questCard.className = 'quest-card';
+            questCard.setAttribute('data-quest-id', quest.quest_id);
+            if (quest.category === 'custom') questCard.setAttribute('data-custom','true');
+            const isCompleted = localStorage.getItem('quest_' + quest.quest_id) === 'completed';
+            const categoryClass = 'category-' + (quest.category || 'custom');
+            const statusClass = isCompleted ? 'completed' : (quest.status || 'active');
+            questCard.innerHTML = `
+                <div>
+                    <span class="quest-category ${categoryClass}">${escapeHtml(quest.category || '')}</span>
+                    <span class="quest-status ${statusClass}">
+                        ${isCompleted ? 'COMPLETED' : (quest.status || 'ACTIVE').toUpperCase()}
+                    </span>
+                </div>
+                <div class="quest-title">${escapeHtml(quest.title)}</div>
+                <div class="quest-description">${escapeHtml(quest.description)}</div>
+                <div>
+                    <button class="start-btn" onclick="startQuest('${quest.quest_id}')">Start</button>
+                    <button class="complete-btn" onclick="completeQuest('${quest.quest_id}')" ${isCompleted ? 'disabled' : ''}>Complete</button>
+                    ${quest.custom ? `<button class="delete-btn" onclick="deleteCustomQuest('${quest.quest_id}')">Delete</button>` : ''}
+                </div>
+            `;
+            questList.appendChild(questCard);
+        });
+    }
+
+    // Load quests (generates new quests + shows custom ones)
+    function loadQuests() {
+        const filter = document.getElementById('quest-filter') ? document.getElementById('quest-filter').value : 'all';
+        const generatedQuests = window.questBoardAPI.generateRandomQuests(6, filter === 'all' ? 'all' : filter);
+        const customQuests = loadCustomQuestsFromStorage();
+        let questsToShow = [];
+        if (filter === 'custom') questsToShow = customQuests.slice();
+        else if (filter === 'all') questsToShow = generatedQuests.concat(customQuests);
+        else questsToShow = generatedQuests.filter(q => q.category === filter);
+
+        currentQuests = questsToShow.slice(); // store a copy for shuffling
+        renderQuestList(currentQuests);
+    }
+
+    // Shuffle current quests and re-render (invoked by "Get New Quests")
+    function shuffleQuestsOrReload() {
+        // if we don't have currentQuests yet, load new ones
+        if (!currentQuests || currentQuests.length === 0) {
+            loadQuests();
+            showMessage('Loaded new quests');
+            return;
+        }
+        // shuffle in-place and re-render
+        shuffleArray(currentQuests);
+        renderQuestList(currentQuests);
+        showMessage('🔀 Quests shuffled');
+    }
+
+    // Event listeners
+    document.getElementById('refresh-quests').addEventListener('click', shuffleQuestsOrReload);
+    document.getElementById('quest-filter').addEventListener('change', function(){
+        // when filter changes, regenerate the list (not shuffle)
+        loadQuests();
+    });
+
+    // Remaining event listeners & logic unchanged
+
     // Login
     document.getElementById('loginForm').addEventListener('submit', function(e){
         e.preventDefault();
@@ -1033,52 +1115,6 @@
         overlay.classList.add('show');
         setTimeout(()=>{ overlay.classList.remove('show'); overlay.innerHTML=''; }, 2200);
     }
-
-    // Load quests
-    function loadQuests() {
-        const questList = document.getElementById('quest-list');
-        questList.innerHTML = '<p style="text-align:center;color:#666">Loading quests...</p>';
-        const filter = document.getElementById('quest-filter') ? document.getElementById('quest-filter').value : 'all';
-        const generatedQuests = window.questBoardAPI.generateRandomQuests(6, filter === 'all' ? 'all' : filter);
-        const customQuests = loadCustomQuestsFromStorage();
-        let questsToShow = [];
-        if (filter === 'custom') questsToShow = customQuests.slice();
-        else if (filter === 'all') questsToShow = generatedQuests.concat(customQuests);
-        else questsToShow = generatedQuests.filter(q => q.category === filter);
-
-        currentQuests = questsToShow;
-        questList.innerHTML = '';
-        if (questsToShow.length === 0) { questList.innerHTML = '<p style="text-align:center;color:#666">No quests available for the selected category.</p>'; return; }
-
-        questsToShow.forEach(quest => {
-            const questCard = document.createElement('div');
-            questCard.className = 'quest-card';
-            questCard.setAttribute('data-quest-id', quest.quest_id);
-            if (quest.category === 'custom') questCard.setAttribute('data-custom','true');
-            const isCompleted = localStorage.getItem('quest_' + quest.quest_id) === 'completed';
-            const categoryClass = 'category-' + (quest.category || 'custom');
-            const statusClass = isCompleted ? 'completed' : (quest.status || 'active');
-            questCard.innerHTML = `
-                <div>
-                    <span class="quest-category ${categoryClass}">${escapeHtml(quest.category || '')}</span>
-                    <span class="quest-status ${statusClass}">
-                        ${isCompleted ? 'COMPLETED' : (quest.status || 'ACTIVE').toUpperCase()}
-                    </span>
-                </div>
-                <div class="quest-title">${escapeHtml(quest.title)}</div>
-                <div class="quest-description">${escapeHtml(quest.description)}</div>
-                <div>
-                    <button class="start-btn" onclick="startQuest('${quest.quest_id}')">Start</button>
-                    <button class="complete-btn" onclick="completeQuest('${quest.quest_id}')" ${isCompleted ? 'disabled' : ''}>Complete</button>
-                    ${quest.custom ? `<button class="delete-btn" onclick="deleteCustomQuest('${quest.quest_id}')">Delete</button>` : ''}
-                </div>
-            `;
-            questList.appendChild(questCard);
-        });
-    }
-
-    document.getElementById('refresh-quests').addEventListener('click', loadQuests);
-    document.getElementById('quest-filter').addEventListener('change', loadQuests);
 
     // Shop loading (minimal visual)
     function loadShop() {
