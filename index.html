@@ -222,7 +222,7 @@
         .form-group input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px; box-sizing: border-box; }
         .form-group input:focus { outline: none; border-color: #667eea; }
 
-        .btn-login { width: 100%; padding: 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 5px; font-size: 16px; font-weight: bold; cursor:pointer; }
+        .btn-login { width: 100%; padding: 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 5px; font-size: 16px; font-weight: bold; cursor: pointer; }
         .btn-login:hover { opacity: 0.9; }
 
         .signup-link { text-align: center; margin-top: 20px; color: #666; }
@@ -244,7 +244,7 @@
         .add-custom-btn:hover { background: #009e90; }
 
         .streak-info { display:flex; flex-direction:column; align-items:flex-end; gap:6px; }
-        .streak-badge { background: linear-gradient(90deg,#ff7043,#ffca28); color: white; padding:6px 12px; border-radius:999px; font-weight:bold; font-size:14px; display:inline-flex; align-items:center;}
+        .streak-badge { background: linear-gradient(90deg,#ff7043,#ffca28); color: white; padding:6px 12px; border-radius:999px; font-weight:bold; font-size:14px; display:inline-flex; align-items:center; }
         .streak-help { font-size:12px; color:#444; opacity:0.85; }
 
         .bg-preview { width:100%; height:70px; border-radius:8px; margin-bottom:10px; border:1px solid rgba(0,0,0,0.06); }
@@ -258,9 +258,9 @@
         }
         #active-quest-screen .active-quest-title { font-size:28px; font-weight:800; margin-bottom:12px; }
         #active-quest-screen .active-quest-description { font-size:18px; color: rgba(255,255,255,0.9); margin-bottom:28px; }
-        #active-quest-screen .mark-complete-btn { background:#4caf50; color:white; border:none; padding:14px 28px; border-radius:8px; font-weight:800; font-size:18px; cursor:pointer; transition:background 0.2s;}
+        #active-quest-screen .mark-complete-btn { background:#4caf50; color:white; border:none; padding:14px 28px; border-radius:8px; font-weight:800; font-size:18px; cursor:pointer; transition:background 0.2s; }
         #active-quest-screen .mark-complete-btn:hover { background:#3f9a3f; }
-        #active-quest-screen .cancel-quest-btn { background: rgba(255,255,255,0.15); color:white; border:none; padding:10px 18px; border-radius:8px; font-weight:700; font-size:14px; cursor:pointer; margin-left:10px; }
+        #active-quest-screen .cancel-quest-btn { background: rgba(255,255,255,0.15); color:white; border:none; padding:10px 18px; border-radius:8px; font-weight:700; font-size:14px; cursor:pointer; margin-left:12px; }
 
         /* inspirational bubble inside active quest */
         .inspire-bubble {
@@ -615,36 +615,48 @@
         </div>
         <div class="terms-body">
             <h3>Introduction</h3>
-            <p>Welcome to QuestBoard! QuestBoard (“the App”) is a health application designed to help users build healthy habits through fun, RPG-style gamification. By accessing or using QuestBoard, you agree to abide by these Terms and Conditions.</p>
+            <p>Welcome to QuestBoard! QuestBoard (“the App”) is a health application designed to help users build healthy habits through fun, RPG-style gamification. By accessing or using QuestBoard you agree to these terms.</p>
+
             <h3>User Eligibility</h3>
             <p>QuestBoard is intended for individuals aged 13 and older. Users under 18 must have parental consent to register and use the App.</p>
+
             <h3>App Purpose</h3>
             <p>QuestBoard is a health app with game elements, encouraging users to form and sustain healthy habits through quests, coins, and social/group features.</p>
+
             <h3>Acceptable Use</h3>
             <p>Users must not use the App for unlawful or abusive purposes.</p>
             <p>Health tracking features are intended only for personal wellness; the App is not a substitute for professional medical advice.</p>
             <p>Users are responsible for the information they enter and share, especially in social/group quests.</p>
+
             <h3>User-Generated Content</h3>
             <p>Quests, avatars, and social interactions rely on user input.</p>
             <p>Users retain rights to their original content but grant QuestBoard a license to use, display, and adapt content within the App.</p>
+
             <h3>In-App Purchases</h3>
             <p>Coins earned in-game can unlock cosmetics. Some features may offer optional purchases.</p>
             <p>All payments are final unless specified otherwise. Refunds are subject to App Store or provider policies.</p>
+
             <h3>Privacy and Data</h3>
             <p>QuestBoard collects wellness and activity data for app functionality, including planned device integrations.</p>
             <p>Data is stored securely and used to enhance user experience.</p>
             <p>Personal and health information is never sold to third parties. Review our Privacy Policy for full details.</p>
+
             <h3>Social Feature and Beta Testing</h3>
             <p>Group quests are available in beta. Features may change, and beta users accept possible instability, bugs, and incomplete functionality.</p>
+
             <h3>Intellectual Property</h3>
             <p>All app code, graphics, and branding are owned by QuestBoard. Users must not copy or distribute App materials.</p>
+
             <h3>Termination and Suspension</h3>
             <p>Accounts may be suspended or terminated for violations of these terms or for misuse or abuse of the app.</p>
+
             <h3>Limitation of Liability</h3>
             <p>QuestBoard is not responsible for loss, injury, or failure to achieve specific health outcomes.</p>
             <p>The App is provided “as is” without any warranties or guarantees.</p>
+
             <h3>Changes to Terms</h3>
             <p>QuestBoard reserves the right to update these terms. Users will be notified of significant changes within the App.</p>
+
             <div class="terms-footer">
                 <button id="terms-ok" class="terms-ok">Close</button>
             </div>
@@ -662,8 +674,6 @@
 </div>
 
 <script>
-    // --- BRIGHTER BACKGROUNDS AND PROFILE STRIP COLORS ---
-
     // Global state & keys
     let coins = parseInt(localStorage.getItem('coins')) || 0;
     let ownedItems = JSON.parse(localStorage.getItem('ownedItems')) || [];
@@ -679,27 +689,17 @@
     const STREAK_REQUIREMENT = 3;
     const STREAK_BONUS_PERCENT_PER_STREAK = 0.10;
 
-    // --- UPDATED: Background styles mapping (Brighter) ---
+    // Background styles mapping
     const BG_STYLES = {
-        bg_light_blue: '#c8f3ff', // much brighter light blue
-        bg_pink: '#ffe6f5',       // much brighter pink
-        bg_light_gray: '#fcfeff', // nearly white light gray
-        bg_blue_gray_grad: 'linear-gradient(135deg,#c8f3ff,#fcfeff)', // ultra bright
-        bg_pink_gray_grad: 'linear-gradient(135deg,#ffe6f5,#fcfeff)', // ultra bright
-        bg_blue_pink_grad: 'linear-gradient(135deg,#c8f3ff,#ffe6f5)'  // ultra bright
+        bg_light_blue: '#e8f5ff', // light blue
+        bg_pink: '#fff0f8', // pink
+        bg_light_gray: '#f5f5f5', // light gray
+        bg_blue_gray_grad: 'linear-gradient(135deg,#e8f5ff,#f5f5f5)', // light blue + light gray
+        bg_pink_gray_grad: 'linear-gradient(135deg,#fff0f8,#f5f5f5)', // pink + light gray
+        bg_blue_pink_grad: 'linear-gradient(135deg,#e8f5ff,#fff0f8)' // light blue + pink
     };
 
-    // --- NEW: Profile strip mapping for brighter/contrasting colors ---
-    const PROFILE_BG_STYLES = {
-        bg_light_blue: '#b9f7ed', // light blue-green for contrast
-        bg_pink: '#ffeff9',       // lighter/brighter pink
-        bg_light_gray: '#ebfdfc', // off-white teal
-        bg_blue_gray_grad: 'linear-gradient(90deg,#b9f7ed,#e8fcff)', // blue-green/blue-white
-        bg_pink_gray_grad: 'linear-gradient(90deg,#ffeff9,#ebfdfc)', // light rose/white
-        bg_blue_pink_grad: 'linear-gradient(90deg,#b9f7ed,#ffeff9)'  // blue-green/pink
-    };
-
-    // Shop items (unchanged)
+    // Shop items
     const SHOP_ITEMS = {
         backgrounds: [
             { id: "bg_light_blue", name: "Light Blue", emoji: "🟦", price: 20, type: "background" },
@@ -766,34 +766,28 @@
     // UI helpers
     function showMessage(text, ms = 2200) {
         const message = document.createElement('div');
-        message.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,0.85);color:white;padding:16px 22px;border-radius:10px;z-index:9999;text-align:center;font-size:16px;box-shadow:0 6px 32px rgba(0,0,0,0.18);';
+        message.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,0.85);color:white;padding:16px 22px;border-radius:10px;z-index:9999;text-align:center;font-weight:700;';
         message.innerHTML = text;
         document.body.appendChild(message);
         setTimeout(()=>message.remove(), ms);
     }
 
-    // --- UPDATED: Background and profile strip apply ---
+    // Background apply
     function applyBackground(id) {
-        // Set main background
         if (!id) {
             document.body.style.background = '';
             document.body.style.backgroundColor = '';
-            const profileDiv = document.querySelector('.user-profile-details-style');
-            if (profileDiv) profileDiv.style.background = '#f5f5f5';
             return;
         }
         const style = BG_STYLES[id];
-        const profileStyle = PROFILE_BG_STYLES[id] || '#f5f5f5';
-        if (style) {
-            document.body.style.background = style;
-            if (!String(style).includes('gradient')) document.body.style.backgroundColor = style;
+        if (!style) return;
+        document.body.style.background = style;
+        if (!style.includes('gradient')) {
+            document.body.style.backgroundColor = style;
         }
-        // Update the top profile strip's color as well
-        const profileDiv = document.querySelector('.user-profile-details-style');
-        if (profileDiv) profileDiv.style.background = profileStyle;
     }
 
-    // Streak UI (unchanged)
+    // Streak UI
     function updateStreakUI() {
         const streakUi = document.getElementById('streak-ui');
         const streakData = loadStreakData();
@@ -804,11 +798,9 @@
         streakUi.appendChild(badge);
         const help = document.createElement('div');
         help.className = 'streak-help';
-        help.innerHTML = `Complete ${STREAK_REQUIREMENT} quests every day to build streaks — each streak gives +${Math.round(STREAK_BONUS_PERCENT_PER_STREAK*100)}% coins per quest. Best: <strong id="best-streak-count">${streakData.bestStreak || 0}</strong>`;
+        help.innerHTML = `Complete ${STREAK_REQUIREMENT} quests every day to build streaks — each streak gives +${Math.round(STREAK_BONUS_PERCENT_PER_STREAK*100)}% coins per quest. Best: <strong id="best-streak">${streakData.bestStreak}</strong>`;
         streakUi.appendChild(help);
     }
-
-    // (Rest of your script remains unchanged...)
 
     // Daily completion & streak logic
     function incrementDailyCompletionFor(dateStr) {
@@ -854,7 +846,7 @@
         const titleElem = document.getElementById('user-title'); if (titleElem) titleElem.textContent = equippedTitle;
     }
 
-    // Minimal questBoardAPI to keep the page functional (unchanged)
+    // Minimal questBoardAPI to keep the page functional
     window.questBoardAPI = {
         generateRandomQuests: function(count = 6, category = 'all') {
             const sample = [
@@ -976,7 +968,7 @@
     }
     window.deleteCustomQuest = deleteCustomQuest;
 
-    // Load quests (rest unchanged)
+    // Load quests
     function loadQuests() {
         const questList = document.getElementById('quest-list');
         questList.innerHTML = '<p style="text-align:center;color:#666">Loading quests...</p>';
@@ -1007,59 +999,437 @@
                 </div>
                 <div class="quest-title">${escapeHtml(quest.title)}</div>
                 <div class="quest-description">${escapeHtml(quest.description)}</div>
-                ${
-                    quest.category === 'custom'
-                        ? `<button class="delete-btn" onclick="deleteCustomQuest('${quest.quest_id}')">Delete</button>`
-                        : ''
-                }
-                ${
-                    !isCompleted
-                        ? `<button class="complete-btn" onclick="markQuestComplete('${quest.quest_id}')">Mark Complete</button>`
-                        : ''
-                }
+                <div>
+                    <button class="complete-btn" onclick="completeQuest(${quest.quest_id})" ${isCompleted ? 'disabled' : ''}>
+                        ${isCompleted ? '✓ Completed' : 'Mark as Complete'}
+                    </button>
+                    <button class="start-btn" onclick="startQuest(${quest.quest_id})">▶ Start</button>
+                    ${quest.category === 'custom' ? `<button class="delete-btn" onclick="deleteCustomQuest(${quest.quest_id})">Delete</button>` : ''}
+                </div>
             `;
             questList.appendChild(questCard);
         });
     }
 
-    // Escape HTML (simple, for safety)
-    function escapeHtml(str) {
-        return String(str)
-            .replace(/&/g, "&amp;")
-            .replace(/"/g, "&quot;")
-            .replace(/'/g, "&#39;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;");
+    document.getElementById('refresh-quests').addEventListener('click', function(){ loadQuests(); });
+
+    document.getElementById('quest-filter').addEventListener('change', function(){ loadQuests(); });
+
+    // Escape HTML for user input
+    function escapeHtml(text) {
+        return String(text)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
     }
 
-    // Dummy markQuestComplete - add your logic as needed
-    function markQuestComplete(questId) {
+    // Inspirational phrases logic
+    const INSPIRATIONAL_PHRASES = [
+        "You got this!",
+        "Keep going!",
+        "Almost there!",
+        "Stay strong!",
+        "Nice work!",
+        "One step at a time!"
+    ];
+
+    function startInspirationalPhrases() {
+        const bubble = document.getElementById('inspire-bubble');
+        if (!bubble) return;
+        // clear any existing
+        stopInspirationalPhrases();
+
+        let idx = 0;
+        bubble.textContent = INSPIRATIONAL_PHRASES[idx];
+        bubble.setAttribute('aria-hidden','false');
+        bubble.classList.add('show');
+
+        // cycle phrases every ~1.8s with a small fade
+        window._inspireInterval = setInterval(() => {
+            bubble.classList.remove('show');
+            // small fade duration to match CSS
+            setTimeout(() => {
+                idx = (idx + 1) % INSPIRATIONAL_PHRASES.length;
+                bubble.textContent = INSPIRATIONAL_PHRASES[idx];
+                bubble.classList.add('show');
+            }, 300);
+        }, 1800);
+    }
+
+    function stopInspirationalPhrases() {
+        const bubble = document.getElementById('inspire-bubble');
+        if (window._inspireInterval) {
+            clearInterval(window._inspireInterval);
+            delete window._inspireInterval;
+        }
+        if (bubble) {
+            bubble.classList.remove('show');
+            bubble.setAttribute('aria-hidden','true');
+            // clear text after a short delay so fade-out looks natural
+            setTimeout(() => { if (bubble) bubble.textContent = ''; }, 300);
+        }
+    }
+
+    // Active quest screen
+    function startQuest(questId) {
+        const quest = currentQuests.find(q => Number(q.quest_id) === Number(questId));
+        const activeScreen = document.getElementById('active-quest-screen');
+        if (!activeScreen) return;
+        const titleEl = activeScreen.querySelector('.active-quest-title');
+        const descEl = activeScreen.querySelector('.active-quest-description');
+        if (quest) { if (titleEl) titleEl.textContent = quest.title; if (descEl) descEl.textContent = quest.description; }
+        else { if (titleEl) titleEl.textContent = 'Active Quest'; if (descEl) descEl.textContent = 'Complete this quest and mark it as completed when finished.'; }
+        activeScreen.setAttribute('data-active-quest-id', questId);
+        document.getElementById('main-content').style.display = 'none';
+        activeScreen.style.display = 'flex';
+        const btn = document.getElementById('mark-complete-btn'); if (btn) btn.focus();
+
+        // start inspirational phrases while the quest is active
+        startInspirationalPhrases();
+    }
+    window.startQuest = startQuest;
+
+    document.getElementById('cancel-quest-btn').addEventListener('click', function(){
+        const activeScreen = document.getElementById('active-quest-screen');
+        activeScreen.style.display = 'none';
+        document.getElementById('main-content').style.display = 'block';
+        // stop inspirational phrases when user returns to board
+        stopInspirationalPhrases();
+    });
+
+    // Mark active quest completed — updated to show animation when finished via "Start"
+    document.getElementById('mark-complete-btn').addEventListener('click', function(){
+        const activeScreen = document.getElementById('active-quest-screen');
+        const questIdAttr = activeScreen.getAttribute('data-active-quest-id');
+        if (!questIdAttr) { activeScreen.style.display = 'none'; document.getElementById('main-content').style.display = 'block'; return; }
+        const questId = Number(questIdAttr);
+
+        // stop inspirational phrases first
+        stopInspirationalPhrases();
+
+        // show an animated celebration, then complete the quest and return to board
+        showQuestCompleteAnimation(questId, function() {
+            // hide active screen and return to main board
+            activeScreen.style.display = 'none';
+            document.getElementById('main-content').style.display = 'block';
+        });
+    });
+
+    // Complete quest (handles custom coin amount + streak bonus)
+    function completeQuest(questId) {
+        // stop phrases if still running (covers direct completions)
+        stopInspirationalPhrases();
+
+        const questCard = document.querySelector(`[data-quest-id="${questId}"]`);
+        let isCustom = false;
+        if (questCard) {
+            questCard.setAttribute('data-completed','true');
+            const statusSpan = questCard.querySelector('.quest-status');
+            const completeBtn = questCard.querySelector('.complete-btn');
+            if (statusSpan) { statusSpan.className = 'quest-status completed'; statusSpan.textContent = 'COMPLETED'; }
+            if (completeBtn) { completeBtn.disabled = true; completeBtn.textContent = '✓ Completed'; }
+            if (questCard.getAttribute('data-custom') === 'true') isCustom = true;
+        }
+        if (!isCustom) {
+            const found = currentQuests.find(q => Number(q.quest_id) === Number(questId));
+            if (found && found.category === 'custom') isCustom = true;
+            else if (!found) {
+                const customQuests = loadCustomQuestsFromStorage();
+                if (customQuests.find(q => Number(q.quest_id) === Number(questId))) isCustom = true;
+            }
+        }
         localStorage.setItem('quest_' + questId, 'completed');
-        showMessage('Quest marked as completed! 🎉');
-        loadQuests();
-        // (add streak & reward coin logic per your original code)
-    }
-    window.markQuestComplete = markQuestComplete;
 
-    // Dummy showLoginAnimation
-    function showLoginAnimation(username, cb) {
-        document.getElementById('login-animation-overlay').classList.add('show');
-        document.getElementById('login-username').textContent = username;
-        setTimeout(() => {
-            document.getElementById('login-animation-overlay').classList.remove('show');
-            cb();
-        }, 1200);
-    }
+        // record daily completions & streaks
+        const streakUpdate = recordCompletionAndMaybeAwardStreak();
+        const streakData = loadStreakData();
+        const currentStreak = streakData.currentStreak || 0;
 
-    // Dummy shop loader - add your logic as needed
+        const base = isCustom ? 5 : 10;
+        const bonus = Math.floor(base * STREAK_BONUS_PERCENT_PER_STREAK * currentStreak);
+        const coinsEarned = base + bonus;
+        coins += coinsEarned;
+        updateCoins();
+
+        // celebration with breakdown — shown only when not suppressed by an external animation
+        if (!window.QUIET_COMPLETE) {
+            const celebration = document.createElement('div');
+            celebration.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#4caf50;color:white;padding:20px 30px;border-radius:10px;font-size:18px;z-index:2000;text-align:center;font-weight:700;';
+            celebration.innerHTML = `🎉 Quest Completed!<br><span style="font-size:16px;">+${base} base coins${bonus>0?(' +'+bonus+' streak bonus'):''} = <strong>+${coinsEarned} coins</strong></span>`;
+            document.body.appendChild(celebration);
+            setTimeout(()=>celebration.remove(), 2600);
+        }
+
+        updateStreakUI();
+        return coinsEarned;
+    }
+    window.completeQuest = completeQuest;
+
+    // Shop rendering & actions
     function loadShop() {
-        // Placeholder - your original logic may populate shop grids
+        const shopData = window.questBoardAPI.getShopItems();
+        renderBackgroundItems(shopData.backgrounds, 'backgrounds-grid');
+        renderShopItems(shopData.avatars, 'avatars-grid', 'avatar');
+        renderShopItems(shopData.cosmetics, 'cosmetics-grid', 'cosmetic');
+        renderCrateItems(shopData.vip_crates, 'crates-grid');
+        updateCoins();
     }
 
-    // On load, apply selected background if already equipped
-    document.addEventListener('DOMContentLoaded', () => {
-        applyBackground(equippedBackground);
+    function renderBackgroundItems(items, containerId) {
+        const container = document.getElementById(containerId);
+        container.innerHTML = '';
+        items.forEach(item => {
+            const owned = ownedItems.includes(item.id);
+            const equipped = (equippedBackground === item.id);
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'shop-item' + (owned ? ' owned' : '') + (equipped ? ' equipped' : '');
+            const previewStyle = BG_STYLES[item.id] || '#fff';
+            itemDiv.innerHTML = `
+                <div class="bg-preview" style="background: ${previewStyle};"></div>
+                <div class="shop-item-name">${item.name}</div>
+                <div class="shop-item-price">${owned ? 'Owned' : item.price + ' coins'}</div>
+                ${!owned ? `<button class="buy-btn" onclick="buyItem('${item.id}', ${item.price}, 'background')">Buy - ${item.price} 💰</button>` :
+                    (equipped ? `<button class="equip-btn" disabled>Equipped ✓</button>` : `<button class="equip-btn" onclick="equipBackground('${item.id}')">Equip</button>`)
+                }
+            `;
+            container.appendChild(itemDiv);
+        });
+    }
+
+    function equipBackground(itemId) {
+        equippedBackground = itemId;
+        localStorage.setItem('equippedBackground', itemId);
+        applyBackground(itemId);
+        loadShop();
+        showMessage('Background equipped');
+    }
+    window.equipBackground = equipBackground;
+
+    function renderShopItems(items, containerId, itemType) {
+        const container = document.getElementById(containerId);
+        container.innerHTML = '';
+        items.forEach(item => {
+            const owned = ownedItems.includes(item.id);
+            const equipped = (itemType === 'avatar' && equippedAvatar === item.emoji) ||
+                            (item.type === 'title' && equippedTitle === item.emoji + ' ' + item.name);
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'shop-item' + (owned ? ' owned' : '') + (equipped ? ' equipped' : '');
+            let buttonHTML = '';
+            if (!owned) buttonHTML = `<button class="buy-btn" onclick="buyItem('${item.id}', ${item.price}, '${itemType}')">Buy - ${item.price} 💰</button>`;
+            else if (!equipped && (itemType === 'avatar' || item.type === 'title')) buttonHTML = `<button class="equip-btn" onclick="equipItem('${item.id}', '${item.emoji}', '${item.name}', '${item.type}')">Equip</button>`;
+            else if (equipped) buttonHTML = `<button class="equip-btn" disabled>Equipped ✓</button>`;
+            else buttonHTML = `<button class="buy-btn" disabled>Owned ✓</button>`;
+            itemDiv.innerHTML = `
+                <div class="shop-item-emoji">${item.emoji}</div>
+                <div class="shop-item-name">${item.name}</div>
+                <div class="shop-item-price">${owned ? 'Owned' : item.price + ' coins'}</div>
+                ${buttonHTML}
+            `;
+            container.appendChild(itemDiv);
+        });
+    }
+
+    function renderCrateItems(crates, containerId) {
+        const container = document.getElementById(containerId);
+        container.innerHTML = '';
+        crates.forEach(crate => {
+            const crateDiv = document.createElement('div');
+            crateDiv.className = 'shop-item';
+            crateDiv.style.cursor = 'pointer';
+            crateDiv.innerHTML = `
+                <div class="shop-item-emoji">${crate.emoji}</div>
+                <div class="shop-item-name">${crate.name}</div>
+                <div style="font-size:12px;color:#ff9800;margin:5px 0;">VIP ${crate.vip_required}+ Required</div>
+                <div class="shop-item-price">${crate.price} coins</div>
+                <div style="font-size:11px;color:#666;margin-top:5px;">${crate.description}</div>
+                <button class="buy-btn" onclick="openCrate('${crate.id}', ${crate.price}, ${crate.vip_required})">Open Crate</button>
+            `;
+            container.appendChild(crateDiv);
+        });
+    }
+
+    function buyItem(itemId, price, itemType) {
+        if (coins >= price) {
+            coins -= price;
+            if (!ownedItems.includes(itemId)) ownedItems.push(itemId);
+            localStorage.setItem('coins', coins);
+            localStorage.setItem('ownedItems', JSON.stringify(ownedItems));
+            updateCoins();
+            loadShop();
+            const message = document.createElement('div');
+            message.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#4caf50;color:white;padding:20px 40px;border-radius:10px;font-size:20px;z-index:2000;text-align:center;font-weight:700;';
+            message.textContent = '✓ Purchase Successful!';
+            document.body.appendChild(message);
+            setTimeout(()=>message.remove(), 1500);
+        } else { alert('Not enough coins! Complete more quests to earn coins.'); }
+    }
+    window.buyItem = buyItem;
+
+    function equipItem(itemId, emoji, name, type) {
+        if (type === 'avatar') {
+            equippedAvatar = emoji;
+            localStorage.setItem('equippedAvatar', equippedAvatar);
+        } else if (type === 'title') {
+            equippedTitle = emoji + ' ' + name;
+            localStorage.setItem('equippedTitle', equippedTitle);
+        }
+        updateProfile();
+        loadShop();
+        showMessage('Item equipped');
+    }
+    window.equipItem = equipItem;
+
+    function openCrate(crateId, price, vipRequired) {
+        if (coins < price) { alert('Not enough coins to open this crate.'); return; }
+        coins -= price;
+        updateCoins();
+        // simple random reward simulation
+        const rewards = ["avatar_1","border_1","title_1","avatar_3"];
+        const reward = rewards[Math.floor(Math.random()*rewards.length)];
+        if (!ownedItems.includes(reward)) ownedItems.push(reward);
+        localStorage.setItem('ownedItems', JSON.stringify(ownedItems));
+        loadShop();
+        showMessage('🎁 Crate opened! You received: ' + reward);
+    }
+    window.openCrate = openCrate;
+
+    function buyQuestMaster() {
+        alert('QuestMaster is currently unavailable in this demo.');
+    }
+
+    // --- Login animation functions (NEW) ---
+    function showLoginAnimation(username, cb) {
+        const overlay = document.getElementById('login-animation-overlay');
+        if (!overlay) {
+            if (typeof cb === 'function') cb();
+            return;
+        }
+        // set username in welcome message
+        const nameEl = document.getElementById('login-username');
+        if (nameEl) nameEl.textContent = username;
+
+        overlay.classList.add('show');
+
+        // create confetti pieces
+        const colors = ['#ffd700', '#ff6b6b', '#6bf0c4', '#8e9bff', '#ffd9a8'];
+        const pieces = 22;
+        const created = [];
+        for (let i = 0; i < pieces; i++) {
+            const c = document.createElement('div');
+            c.className = 'login-confetti';
+            const left = Math.random() * 80 + 10; // 10% - 90%
+            c.style.left = left + '%';
+            c.style.background = colors[Math.floor(Math.random() * colors.length)];
+            c.style.setProperty('--dur', (900 + Math.floor(Math.random() * 700)) + 'ms');
+            c.style.transform = `translateY(0) rotate(${Math.floor(Math.random()*360)}deg)`;
+            // stagger delay
+            c.style.animationDelay = (Math.random() * 220) + 'ms';
+            overlay.appendChild(c);
+            created.push(c);
+        }
+
+        // duration for the whole overlay (slightly longer than confetti animation)
+        const totalMs = 1600;
+        setTimeout(() => {
+            // clean confetti
+            created.forEach(el => el.remove());
+            overlay.classList.remove('show');
+            // small delay to allow fade-out
+            setTimeout(() => {
+                if (typeof cb === 'function') cb();
+            }, 260);
+        }, totalMs);
+    }
+
+    // --- Quest completion animation (NEW) ---
+    // When user finishes a quest via the "Start" flow (fullscreen active quest),
+    // show a full-screen celebratory animation, then call completeQuest (quietly)
+    function showQuestCompleteAnimation(questId, cb) {
+        const overlay = document.getElementById('quest-complete-overlay');
+        if (!overlay) {
+            // fallback: just complete and callback
+            completeQuest(questId);
+            if (typeof cb === 'function') cb();
+            return;
+        }
+
+        // ensure phrases stopped
+        stopInspirationalPhrases();
+
+        // create card content
+        overlay.innerHTML = ''; // clear
+        overlay.classList.add('show');
+        overlay.setAttribute('aria-hidden', 'false');
+
+        const card = document.createElement('div');
+        card.className = 'qc-card';
+        const title = document.createElement('div');
+        title.className = 'qc-title';
+        title.textContent = 'Quest Completed!';
+        const sub = document.createElement('div');
+        sub.className = 'qc-sub';
+        sub.textContent = 'Great job — rewards incoming.';
+        const coinsBox = document.createElement('div');
+        coinsBox.className = 'qc-coins';
+        coinsBox.innerHTML = `<div class="qc-coin">+<span id="qc-coin-amount">0</span> 💰</div>`;
+
+        card.appendChild(title);
+        card.appendChild(sub);
+        card.appendChild(coinsBox);
+        overlay.appendChild(card);
+
+        // small confetti burst
+        const colors = ['#ffd700', '#ff6b6b', '#6bf0c4', '#8e9bff', '#ffd9a8'];
+        const pieces = 18;
+        const created = [];
+        for (let i = 0; i < pieces; i++) {
+            const c = document.createElement('div');
+            c.className = 'qc-confetti';
+            const left = Math.random() * 80 + 10; // 10% - 90%
+            c.style.left = left + '%';
+            c.style.background = colors[Math.floor(Math.random() * colors.length)];
+            c.style.animationDelay = (Math.random() * 240) + 'ms';
+            overlay.appendChild(c);
+            created.push(c);
+        }
+
+        // Suppress the small inline celebration in completeQuest while we run our animation
+        window.QUIET_COMPLETE = true;
+
+        // call completeQuest immediately so coins and streaks update (but its celebration is suppressed)
+        const coinsEarned = completeQuest(questId);
+
+        // update number in overlay
+        const qcAmount = document.getElementById('qc-coin-amount');
+        if (qcAmount) qcAmount.textContent = coinsEarned;
+
+        // animation duration
+        const totalMs = 1600;
+        // after animation, clean up & callback
+        setTimeout(() => {
+            // remove confetti pieces
+            created.forEach(el => el.remove());
+            overlay.classList.remove('show');
+            overlay.setAttribute('aria-hidden', 'true');
+            // small delay to allow fade-out
+            setTimeout(() => {
+                // restore celebration behavior
+                window.QUIET_COMPLETE = false;
+                overlay.innerHTML = '';
+                if (typeof cb === 'function') cb();
+            }, 260);
+        }, totalMs);
+    }
+    window.showQuestCompleteAnimation = showQuestCompleteAnimation;
+
+    // Initialize UI on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        updateCoins(); updateProfile(); updateStreakUI(); applyBackground(equippedBackground);
+        // Preload quests when logged-in; initial state hides main content
     });
 </script>
+
 </body>
 </html>
