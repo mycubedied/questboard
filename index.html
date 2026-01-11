@@ -244,8 +244,53 @@
         .add-custom-btn:hover { background: #009e90; }
 
         .streak-info { display:flex; flex-direction:column; align-items:flex-end; gap:6px; }
-        .streak-badge { background: linear-gradient(90deg,#ff7043,#ffca28); color: white; padding:6px 12px; border-radius:999px; font-weight:bold; font-size:14px; display:inline-flex; align-items:center; }
-        .streak-help { font-size:12px; color:#444; opacity:0.85; }
+        .streak-badge { 
+            background: linear-gradient(90deg,#ff7043,#ffca28); 
+            color: white; 
+            padding:6px 12px; 
+            border-radius:999px; 
+            font-weight:bold; 
+            font-size:14px; 
+            display:inline-flex; 
+            align-items:center;
+            position: relative; /* Anchor for tooltip */
+            cursor: help;
+        }
+        /* Reveal tooltip on hover */
+        .streak-badge:hover .streak-help {
+            display: block;
+            animation: fadeIn 0.2s;
+        }
+
+        .streak-help { 
+            display: none; /* Hidden by default */
+            position: absolute;
+            top: 100%;
+            right: 0;
+            width: 220px;
+            background: rgba(0,0,0,0.9);
+            color: #fff;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: normal;
+            z-index: 100;
+            margin-top: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            text-align: left;
+            line-height: 1.4;
+        }
+        /* caret for tooltip */
+        .streak-help::before {
+            content: "";
+            position: absolute;
+            top: -6px;
+            right: 15px;
+            border-width: 0 6px 6px 6px;
+            border-style: solid;
+            border-color: transparent transparent rgba(0,0,0,0.9) transparent;
+        }
+        @keyframes fadeIn { from { opacity:0; transform:translateY(-5px); } to { opacity:1; transform:translateY(0); } }
 
         .bg-preview { width:100%; height:70px; border-radius:8px; margin-bottom:10px; border:1px solid rgba(0,0,0,0.06); }
 
@@ -795,11 +840,13 @@
         const badge = document.createElement('div');
         badge.className = 'streak-badge';
         badge.innerHTML = `🔥 Streak: <span id="streak-count">${streakData.currentStreak}</span>`;
-        streakUi.appendChild(badge);
+        
         const help = document.createElement('div');
         help.className = 'streak-help';
-        help.innerHTML = `Complete ${STREAK_REQUIREMENT} quests every day to build streaks — each streak gives +${Math.round(STREAK_BONUS_PERCENT_PER_STREAK*100)}% coins per quest. Best: <strong id="best-streak">${streakData.bestStreak}</strong>`;
-        streakUi.appendChild(help);
+        help.innerHTML = `Complete ${STREAK_REQUIREMENT} quests every day to build streaks — each streak gives +${Math.round(STREAK_BONUS_PERCENT_PER_STREAK*100)}% coins per quest.<br><br>Best Streak: <strong id="best-streak">${streakData.bestStreak}</strong>`;
+        
+        badge.appendChild(help); // Nest help inside badge
+        streakUi.appendChild(badge);
     }
 
     // Daily completion & streak logic
