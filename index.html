@@ -1048,6 +1048,27 @@
             </form>
             <div class="signup-link">Don't have an account? <a href="#" id="signup-link">Sign up</a></div>
         </div>
+
+        <!-- Signup Container (Hidden by default) -->
+        <div class="login-container" id="signup-container" style="display: none;">
+            <div class="login-header">
+                <h2>📝 Create Account</h2>
+                <p style="color: #666; margin-top: 10px;">Join the quest!</p>
+            </div>
+            <form id="signupForm">
+                <div class="form-group">
+                    <label for="new-username">Username</label>
+                    <input type="text" id="new-username" name="username" required placeholder="Choose a username">
+                </div>
+                <div class="form-group">
+                    <label for="new-password">Password</label>
+                    <input type="password" id="new-password" name="password" required placeholder="Choose a password">
+                </div>
+                <button type="submit" class="btn-login" style="background: #4CAF50;">Create Account</button>
+                <div class="error-message" id="signup-error-message"></div>
+            </form>
+            <div class="signup-link">Already have an account? <a href="#" id="back-to-login">Login</a></div>
+        </div>
     </div>
 
     <!-- Main Quest Board (Hidden until login) -->
@@ -1272,6 +1293,7 @@
         const CUSTOM_QUESTS_KEY = 'customQuests_v1';
         const DAILY_COMPLETIONS_KEY = 'dailyCompletions_v1';
         const STREAK_DATA_KEY = 'streakData_v1';
+        const USERS_KEY = 'qb_users_v1';
 
         const STREAK_REQUIREMENT = 3;
         const STREAK_BONUS_PERCENT_PER_STREAK = 0.10;
@@ -1286,43 +1308,7 @@
             bg_blue_pink_grad: 'linear-gradient(135deg,#1e90ff,#ff6ec7)' // light blue + pink
         };
 
-        // Shop items
-        const SHOP_ITEMS = {
-            backgrounds: [
-                { id: "bg_light_blue", name: "Light Blue", emoji: "🟦", price: 20, type: "background" },
-                { id: "bg_pink", name: "Pink", emoji: "🟥", price: 20, type: "background" },
-                { id: "bg_light_gray", name: "Light Gray", emoji: "⬜", price: 15, type: "background" },
-                { id: "bg_blue_gray_grad", name: "Light Blue → Light Gray", emoji: "🎨", price: 30, type: "background" },
-                { id: "bg_pink_gray_grad", name: "Pink → Light Gray", emoji: "🎨", price: 30, type: "background" },
-                { id: "bg_blue_pink_grad", name: "Light Blue → Pink", emoji: "🎨", price: 30, type: "background" }
-            ],
-            avatars: [
-                { id: "avatar_1", name: "Fitness Pro", emoji: "🏋️", price: 50, type: "avatar" },
-                { id: "avatar_2", name: "Yoga Master", emoji: "🧘", price: 50, type: "avatar" },
-                { id: "avatar_3", name: "Runner", emoji: "🏃", price: 50, type: "avatar" },
-                { id: "avatar_4", name: "Cyclist", emoji: "🚴", price: 75, type: "avatar" },
-                { id: "avatar_5", name: "Swimmer", emoji: "🏊", price: 75, type: "avatar" },
-                { id: "avatar_6", name: "Champion", emoji: "🏆", price: 100, type: "avatar" },
-                { id: "avatar_7", name: "Martial Artist", emoji: "🥋", price: 100, type: "avatar" },
-                { id: "avatar_8", name: "Boxer", emoji: "🥊", price: 100, type: "avatar" }
-            ],
-            cosmetics: [
-                { id: "border_1", name: "Gold Border", emoji: "✨", price: 30, type: "border", color: "#ffd700" },
-                { id: "border_2", name: "Silver Border", emoji: "⭐", price: 20, type: "border", color: "#c0c0c0" },
-                { id: "border_3", name: "Bronze Border", emoji: "🔶", price: 10, type: "border", color: "#cd7f32" },
-                { id: "border_4", name: "Rainbow Border", emoji: "🌈", price: 150, type: "border", color: "linear-gradient(90deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #8b00ff)" },
-                { id: "title_1", name: "Beginner", emoji: "🌱", price: 5, type: "title" },
-                { id: "title_2", name: "Warrior", emoji: "⚔️", price: 50, type: "title" },
-                { id: "title_3", name: "Legend", emoji: "👑", price: 100, type: "title" },
-                { id: "title_4", name: "sigma", emoji: "🗿", price: 67410000, type: "title" }
-            ],
-            vip_crates: [
-                { id: "bronze_crate", name: "Bronze VIP Crate", emoji: "📦", price: 100, type: "crate", vip_required: 1, description: "Basic VIP crate with common rewards" },
-                { id: "silver_crate", name: "Silver VIP Crate", emoji: "🎁", price: 250, type: "crate", vip_required: 2, description: "Advanced VIP crate with uncommon and rare rewards" },
-                { id: "gold_crate", name: "Gold VIP Crate", emoji: "🏆", price: 500, type: "crate", vip_required: 3, description: "Premium VIP crate with epic and legendary rewards" },
-                { id: "platinum_crate", name: "Platinum VIP Crate", emoji: "💫", price: 1000, type: "crate", vip_required: 5, description: "Ultimate VIP crate with guaranteed legendary rewards" }
-            ]
-        };
+        // Shop items - loaded from questboard.js via window.questBoardAPI
 
         // Utility: date string YYYY-MM-DD
         function todayStr(offsetDays = 0) {
@@ -1349,6 +1335,12 @@
             catch (e) { console.error(e); return { currentStreak: 0, bestStreak: 0, lastStreakDate: null }; }
         }
         function saveStreakData(obj) { localStorage.setItem(STREAK_DATA_KEY, JSON.stringify(obj)); }
+
+        function loadUsers() {
+            try { const raw = localStorage.getItem(USERS_KEY); return raw ? JSON.parse(raw) : {}; }
+            catch (e) { console.error('parse users', e); return {}; }
+        }
+        function saveUsers(users) { localStorage.setItem(USERS_KEY, JSON.stringify(users)); }
 
         // UI helpers
         function showMessage(text, ms = 2200) {
@@ -1435,7 +1427,7 @@
             const titleElem = document.getElementById('user-title'); if (titleElem) titleElem.textContent = equippedTitle;
         }
 
-        // API is loaded from main.js
+        // API is loaded from questboard.js
 
         // Login
         document.getElementById('loginForm').addEventListener('submit', function (e) {
@@ -1443,7 +1435,17 @@
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
             const errorMessage = document.getElementById('error-message');
-            if (username && password) {
+
+            // Validate credentials
+            const users = loadUsers();
+
+            // For backward compatibility / testing if no users exist allow anything OR force setup
+            // Decision: Enforce proper login if users exist, otherwise create a test user or fail
+            // Better: Strict check. If user doesn't exist or pass wrong, fail.
+            // SPECIAL CASE: Only if database is COMPLETELY empty, allow 'test'/'test' to work and auto-create?
+            // No, let's keep it simple: Must exist in storage.
+
+            if (users[username] && users[username] === password) {
                 // Play the login animation and only reveal the main UI when it's done
                 showLoginAnimation(username, function () {
                     document.getElementById('login-page').style.display = 'none';
@@ -1455,18 +1457,67 @@
                     applyBackground(equippedBackground);
                     loadQuests();
                 });
-            } else { errorMessage.textContent = 'Please enter both username and password'; }
+            } else {
+                errorMessage.textContent = 'Invalid username or password.';
+            }
+        });
+
+        // Signup Logic
+        document.getElementById('signupForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const username = document.getElementById('new-username').value.trim();
+            const password = document.getElementById('new-password').value;
+            const errorMessage = document.getElementById('signup-error-message');
+
+            if (!username || !password) {
+                errorMessage.textContent = 'Please fill in all fields.';
+                return;
+            }
+
+            const users = loadUsers();
+            if (users[username]) {
+                errorMessage.textContent = 'Username already exists.';
+                return;
+            }
+
+            // Save new user
+            users[username] = password;
+            saveUsers(users);
+
+            // Auto-login or redirect to login? Let's redirect to login for clarity.
+            // Or better: Just switch views and fill the login form.
+            document.getElementById('signup-container').style.display = 'none';
+            document.querySelector('.login-container').style.display = 'block';
+            document.getElementById('username').value = username;
+            document.getElementById('password').value = password;
+            document.getElementById('error-message').style.color = 'green';
+            document.getElementById('error-message').textContent = 'Account created! Please log in.';
+        });
+
+        // Toggle Login/Signup
+        document.getElementById('signup-link').addEventListener('click', function (e) {
+            e.preventDefault();
+            document.querySelector('.login-container').style.display = 'none';
+            document.getElementById('signup-container').style.display = 'block';
+            document.getElementById('signup-error-message').textContent = '';
+        });
+
+        document.getElementById('back-to-login').addEventListener('click', function (e) {
+            e.preventDefault();
+            document.getElementById('signup-container').style.display = 'none';
+            document.querySelector('.login-container').style.display = 'block';
+            document.getElementById('error-message').textContent = '';
         });
 
         document.getElementById('logout-btn').addEventListener('click', function () {
             document.getElementById('login-page').style.display = 'block';
+            document.querySelector('.login-container').style.display = 'block';
+            document.getElementById('signup-container').style.display = 'none';
             document.getElementById('main-content').style.display = 'none';
             document.getElementById('username').value = '';
             document.getElementById('password').value = '';
             document.getElementById('error-message').textContent = '';
         });
-
-        document.getElementById('signup-link').addEventListener('click', function (e) { e.preventDefault(); alert('Signup functionality coming soon!'); });
 
         // Shop modal
         document.getElementById('shop-btn').addEventListener('click', function () { document.getElementById('shop-modal').style.display = 'block'; loadShop(); });
