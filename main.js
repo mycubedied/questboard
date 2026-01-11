@@ -1,36 +1,34 @@
 // Quest generation logic
-const QUEST_TEMPLATES = {
-    cardio: [
-        { activity: "Run", units: "minutes", range: [10, 30] },
-        { activity: "Walk", units: "minutes", range: [15, 45] },
-        { activity: "Jump rope", units: "minutes", range: [5, 15] },
-        { activity: "Cycling", units: "minutes", range: [15, 40] },
-        { activity: "Swimming", units: "minutes", range: [10, 30] },
-        { activity: "Dancing", units: "minutes", range: [15, 30] }
-    ],
-    strength: [
-        { activity: "Push-ups", units: "reps", range: [10, 50] },
-        { activity: "Squats", units: "reps", range: [15, 60] },
-        { activity: "Lunges", units: "reps", range: [10, 40] },
-        { activity: "Plank hold", units: "seconds", range: [30, 120] },
-        { activity: "Wall sits", units: "seconds", range: [30, 90] },
-        { activity: "Burpees", units: "reps", range: [10, 30] },
-        { activity: "Mountain climbers", units: "reps", range: [20, 60] },
-        { activity: "Sit-ups", units: "reps", range: [15, 50] },
-        { activity: "Pull-ups", units: "reps", range: [5, 20] }
-    ],
-    flexibility: [
-        { activity: "Yoga session", units: "minutes", range: [10, 30] },
-        { activity: "Stretching routine", units: "minutes", range: [10, 20] },
-        { activity: "Foam rolling", units: "minutes", range: [5, 15] }
-    ],
-    wellness: [
-        { activity: "Drink water", units: "glasses", range: [6, 10] },
-        { activity: "Meditate", units: "minutes", range: [5, 20] },
-        { activity: "Sleep", units: "hours", range: [7, 9] },
-        { activity: "Take deep breaths", units: "cycles", range: [5, 15] },
-        { activity: "Go Outside and Touch Grass", units: "minutes", range: [10, 30] }
-    ]
+// Quest Data Configuration
+const QUEST_DATA = {
+    cardio: {
+        exercises: ["Run", "Walk", "Jump Rope", "Cycling", "Swimming", "Dancing", "Stair Climbing", "Hiking", "Rowing", "Elliptical"],
+        units: "minutes",
+        amounts: [10, 15, 20, 25, 30, 40, 45, 60]
+    },
+    strength: {
+        exercises: ["Push-ups", "Squats", "Lunges", "Burpees", "Mountain Climbers", "Sit-ups", "Pull-ups", "Plank", "Wall Sits", "Glute Bridges"],
+        units: "reps",
+        amounts: [10, 15, 20, 25, 30, 40, 50],
+        // Special case for time-based strength exercises
+        timed: ["Plank", "Wall Sits"],
+        timed_units: "seconds",
+        timed_amounts: [30, 45, 60, 90, 120]
+    },
+    flexibility: {
+        exercises: ["Yoga Flow", "Full Body Stretch", "Hamstring Stretch", "Shoulder Stretch", "Hip Opener", "Foam Rolling", "Sun Salutations"],
+        units: "minutes",
+        amounts: [5, 10, 15, 20, 30]
+    },
+    wellness: {
+        exercises: ["Meditation", "Deep Breathing", "Reading", "Journaling", "Digital Detox", "Nap", "Nature Walk", "Gratitude Log"],
+        units: "minutes",
+        amounts: [5, 10, 15, 20, 30, 60],
+        // Special case for count-based wellness
+        counted: ["Drink Water", "Deep Breaths"],
+        counted_units: "times",
+        counted_amounts: [5, 8, 10, 12]
+    }
 };
 
 const SHOP_ITEMS = {
@@ -102,20 +100,47 @@ const VIP_CRATES = {
     }
 };
 
-function generateRandomQuests(count = 6) {
+function generateRandomQuests(count = 6, filterCategory = 'all') {
     const quests = [];
-    const categories = Object.keys(QUEST_TEMPLATES);
+    const categories = Object.keys(QUEST_DATA);
 
     for (let i = 0; i < count; i++) {
-        const category = categories[i % categories.length];
-        const templates = QUEST_TEMPLATES[category];
-        const template = templates[Math.floor(Math.random() * templates.length)];
-        const amount = Math.floor(Math.random() * (template.range[1] - template.range[0] + 1)) + template.range[0];
+        // Determine category
+        let category = filterCategory;
+        if (filterCategory === 'all') {
+            category = categories[Math.floor(Math.random() * categories.length)];
+        }
+
+        // Get data for the category
+        const data = QUEST_DATA[category];
+        if (!data) continue;
+
+        let exercise, amount, units;
+
+        // Logic to handle special subtypes (like timed strength or counted wellness)
+        const roll = Math.random();
+
+        if (category === 'strength' && roll < 0.3 && data.timed) {
+            // Timed strength exercise
+            exercise = data.timed[Math.floor(Math.random() * data.timed.length)];
+            amount = data.timed_amounts[Math.floor(Math.random() * data.timed_amounts.length)];
+            units = data.timed_units;
+        } else if (category === 'wellness' && roll < 0.3 && data.counted) {
+            // Counted wellness activity
+            exercise = data.counted[Math.floor(Math.random() * data.counted.length)];
+            amount = data.counted_amounts[Math.floor(Math.random() * data.counted_amounts.length)];
+            units = data.counted_units;
+        } else {
+            // Standard
+            exercise = data.exercises[Math.floor(Math.random() * data.exercises.length)];
+            amount = data.amounts[Math.floor(Math.random() * data.amounts.length)];
+            units = data.units;
+        }
 
         quests.push({
-            quest_id: i + 1,
-            title: `${template.activity} Challenge`,
-            description: `Complete ${amount} ${template.units} of ${template.activity.toLowerCase()}`,
+            quest_id: Date.now() + i + Math.floor(Math.random() * 10000),
+            title: `${exercise} Challenge`,
+            description: `Complete ${amount} ${units} of ${exercise}`,
             category: category,
             status: "active"
         });
