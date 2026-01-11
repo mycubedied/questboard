@@ -1503,7 +1503,7 @@
             if (!title) { alert('Please enter a title for the custom quest.'); return; }
             if (!description) { alert('Please enter a description for the custom quest.'); return; }
             const customQuests = loadCustomQuestsFromStorage();
-            const questId = Date.now() + Math.floor(Math.random() * 1000);
+            const questId = 'custom_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
             const newQuest = { quest_id: questId, title, description, category: 'custom', status: 'active', custom: true };
             customQuests.push(newQuest);
             saveCustomQuestsToStorage(customQuests);
@@ -1515,7 +1515,7 @@
         function deleteCustomQuest(questId) {
             if (!confirm('Delete this custom quest? This cannot be undone.')) return;
             const customQuests = loadCustomQuestsFromStorage();
-            const filtered = customQuests.filter(q => Number(q.quest_id) !== Number(questId));
+            const filtered = customQuests.filter(q => String(q.quest_id) !== String(questId));
             saveCustomQuestsToStorage(filtered);
             try { localStorage.removeItem('quest_' + questId); } catch (e) { }
             showMessage('Custom quest deleted');
@@ -1555,11 +1555,11 @@
                 <div class="quest-title">${escapeHtml(quest.title)}</div>
                 <div class="quest-description">${escapeHtml(quest.description)}</div>
                 <div>
-                    <button class="complete-btn" onclick="completeQuest(${quest.quest_id})" ${isCompleted ? 'disabled' : ''}>
+                    <button class="complete-btn" onclick="completeQuest('${quest.quest_id}')" ${isCompleted ? 'disabled' : ''}>
                         ${isCompleted ? '✓ Completed' : 'Mark as Complete'}
                     </button>
-                    <button class="start-btn" onclick="startQuest(${quest.quest_id})">▶ Start</button>
-                    ${quest.category === 'custom' ? `<button class="delete-btn" onclick="deleteCustomQuest(${quest.quest_id})">Delete</button>` : ''}
+                    <button class="start-btn" onclick="startQuest('${quest.quest_id}')">▶ Start</button>
+                    ${quest.category === 'custom' ? `<button class="delete-btn" onclick="deleteCustomQuest('${quest.quest_id}')">Delete</button>` : ''}
                 </div>
             `;
                 questList.appendChild(questCard);
@@ -1629,7 +1629,7 @@
 
         // Active quest screen
         function startQuest(questId) {
-            const quest = currentQuests.find(q => Number(q.quest_id) === Number(questId));
+            const quest = currentQuests.find(q => String(q.quest_id) === String(questId));
             const activeScreen = document.getElementById('active-quest-screen');
             if (!activeScreen) return;
             const titleEl = activeScreen.querySelector('.active-quest-title');
@@ -1659,7 +1659,7 @@
             const activeScreen = document.getElementById('active-quest-screen');
             const questIdAttr = activeScreen.getAttribute('data-active-quest-id');
             if (!questIdAttr) { activeScreen.style.display = 'none'; document.getElementById('main-content').style.display = 'block'; return; }
-            const questId = Number(questIdAttr);
+            const questId = questIdAttr;
 
             // stop inspirational phrases first
             stopInspirationalPhrases();
@@ -1688,11 +1688,11 @@
                 if (questCard.getAttribute('data-custom') === 'true') isCustom = true;
             }
             if (!isCustom) {
-                const found = currentQuests.find(q => Number(q.quest_id) === Number(questId));
+                const found = currentQuests.find(q => String(q.quest_id) === String(questId));
                 if (found && found.category === 'custom') isCustom = true;
                 else if (!found) {
                     const customQuests = loadCustomQuestsFromStorage();
-                    if (customQuests.find(q => Number(q.quest_id) === Number(questId))) isCustom = true;
+                    if (customQuests.find(q => String(q.quest_id) === String(questId))) isCustom = true;
                 }
             }
             localStorage.setItem('quest_' + questId, 'completed');
