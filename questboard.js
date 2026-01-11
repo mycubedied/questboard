@@ -145,6 +145,7 @@ function generateRandomQuests(count = 6, filterCategory = 'all') {
             units = data.units;
         }
 
+        // Use a string ID prefix 'daily_' and random number
         quests.push({
             quest_id: 'daily_' + Date.now() + '_' + i + '_' + Math.floor(Math.random() * 10000),
             title: `${exercise} Challenge`,
