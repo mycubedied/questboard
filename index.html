@@ -1435,41 +1435,7 @@
             const titleElem = document.getElementById('user-title'); if (titleElem) titleElem.textContent = equippedTitle;
         }
 
-        // Minimal questBoardAPI to keep the page functional
-        window.questBoardAPI = {
-            generateRandomQuests: function (count = 6, category = 'all') {
-                const sample = [
-                    { title: "30-Minute Walk", description: "A brisk walk for 30 minutes.", category: "cardio", status: "active" },
-                    { title: "Push-up Set", description: "Do 3 sets of 10 push-ups.", category: "strength", status: "active" },
-                    { title: "Stretch Routine", description: "10 minutes of full-body stretching.", category: "flexibility", status: "active" },
-                    { title: "Mindful Breathing", description: "5 minutes of breathing exercises.", category: "wellness", status: "active" },
-                    { title: "Short Run", description: "Run for 15-20 minutes at an easy pace.", category: "cardio", status: "active" },
-                    { title: "Core Workout", description: "Plank + bicycle crunches for core.", category: "strength", status: "active" }
-                ];
-                let pool = sample.slice();
-                // filter by category if needed
-                if (category !== 'all') pool = pool.filter(q => q.category === category);
-                // if filtered pool smaller than requested, use sample again
-                while (pool.length < count) pool = pool.concat(sample);
-                // build final list
-                const out = [];
-                for (let i = 0; i < count; i++) {
-                    const src = pool[i % pool.length];
-                    out.push({
-                        quest_id: Date.now() + i + Math.floor(Math.random() * 1000),
-                        title: src.title,
-                        description: src.description,
-                        category: src.category,
-                        status: src.status,
-                        custom: false
-                    });
-                }
-                return out;
-            },
-            getShopItems: function () {
-                return SHOP_ITEMS;
-            }
-        };
+        // API is loaded from main.js
 
         // Login
         document.getElementById('loginForm').addEventListener('submit', function (e) {
