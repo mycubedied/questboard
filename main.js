@@ -138,7 +138,7 @@ function generateRandomQuests(count = 6, filterCategory = 'all') {
         }
 
         quests.push({
-            quest_id: Date.now() + i + Math.floor(Math.random() * 10000),
+            quest_id: 'daily_' + Date.now() + '_' + i + '_' + Math.floor(Math.random() * 10000),
             title: `${exercise} Challenge`,
             description: `Complete ${amount} ${units} of ${exercise}`,
             category: category,
