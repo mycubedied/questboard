@@ -32,6 +32,14 @@ const QUEST_DATA = {
 };
 
 const SHOP_ITEMS = {
+    backgrounds: [
+        { id: "bg_light_blue", name: "Light Blue", emoji: "🟦", price: 20, type: "background" },
+        { id: "bg_pink", name: "Pink", emoji: "🟥", price: 20, type: "background" },
+        { id: "bg_light_gray", name: "Light Gray", emoji: "⬜", price: 15, type: "background" },
+        { id: "bg_blue_gray_grad", name: "Light Blue → Light Gray", emoji: "🎨", price: 30, type: "background" },
+        { id: "bg_pink_gray_grad", name: "Pink → Light Gray", emoji: "🎨", price: 30, type: "background" },
+        { id: "bg_blue_pink_grad", name: "Light Blue → Pink", emoji: "🎨", price: 30, type: "background" }
+    ],
     avatars: [
         { id: "avatar_1", name: "Fitness Pro", emoji: "🏋️", price: 50, type: "avatar" },
         { id: "avatar_2", name: "Yoga Master", emoji: "🧘", price: 50, type: "avatar" },
